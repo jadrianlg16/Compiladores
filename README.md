@@ -6,9 +6,9 @@ Lenguaje del mini-proyecto: **Rust**.
 
 ## Contenido
 
-| Carpeta | Entrega | Estado |
+| Carpeta | Entrega | Fecha límite |
 |---|---|---|
-| [`tarea1-estructuras-datos/`](tarea1-estructuras-datos/) | Tarea 1: STACK (LIFO), QUEUE (FIFO) y TABLE/DICTIONARY (ordenado por llave), con versión sobre la biblioteca estándar y versión manual | Entregada 2026-10-01 |
+| [`tarea1-estructuras-datos/`](tarea1-estructuras-datos/) | Tarea 1: STACK (LIFO), QUEUE (FIFO) y TABLE/DICTIONARY (ordenado por llave), con versión sobre la biblioteca estándar y versión manual | 2026-10-01 |
 
 ## Tarea 1 en corto
 
