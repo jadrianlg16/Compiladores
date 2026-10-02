@@ -1,0 +1,32 @@
+
+=== STANDARD LIBRARY ===
+Stack top: Some(30); size: 3
+Stack removal order: 30 20 10
+Queue front: Some(10); size: 3
+Queue removal order: 10 20 30
+Empty removal: stack=None, queue=None
+Lookup total: Some("int")
+Update total; old type: Some("int")
+Contains name: true
+Remove name: Some("string")
+Missing lookup: None
+Dictionary in key order (2 entries):
+  active -> bool
+  total -> float
+After clear: stack=true, queue=true, dictionary=true
+
+=== MANUAL NODES ===
+Stack top: Some(30); size: 3
+Stack removal order: 30 20 10
+Queue front: Some(10); size: 3
+Queue removal order: 10 20 30
+Empty removal: stack=None, queue=None
+Lookup total: Some("int")
+Update total; old type: Some("int")
+Contains name: true
+Remove name: Some("string")
+Missing lookup: None
+Dictionary in key order (2 entries):
+  active -> bool
+  total -> float
+After clear: stack=true, queue=true, dictionary=true

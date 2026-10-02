@@ -1,0 +1,34 @@
+{
+  "src/lib.rs": {
+    "sha256": "a6f9730e5a421f32d74169b1813c115a241f90b33417f72eb10abfb80f34ec08",
+    "lines": 8
+  },
+  "src/contracts.rs": {
+    "sha256": "89d7ae42756cafb8e47e9dfe6afa26f94817d2c53d284f135b49a1a9aaeb39eb",
+    "lines": 41
+  },
+  "src/std_impl.rs": {
+    "sha256": "221696f73d3d3ed6ba1bfe77317df95f71204b63716918c7431f92796e7f1bab",
+    "lines": 90
+  },
+  "src/manual_stack.rs": {
+    "sha256": "3e4d7310c56a6547b92d1e4cd18506b7ad9e1dedc8c23000caf6ee1d137b8440",
+    "lines": 46
+  },
+  "src/manual_queue.rs": {
+    "sha256": "944640dfac5ff8079346aef832916015a019daf1d8f8c80905f34a412e18594b",
+    "lines": 50
+  },
+  "src/manual_map.rs": {
+    "sha256": "5736809c24b5e4c482f310bd1e69c07962e6f0489fee936bbdb4cd0e56b88960",
+    "lines": 146
+  },
+  "src/main.rs": {
+    "sha256": "e3ecd1ecce0d4dcf39f98547a478ea1ee0392616eae96c4c11661cd8914951c2",
+    "lines": 70
+  },
+  "tests/behavior.rs": {
+    "sha256": "9923bbd707ac2308fc66c8515a719f007ccc7faf65553e048f2ae4da7cc9bd23",
+    "lines": 323
+  }
+}

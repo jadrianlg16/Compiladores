@@ -1,0 +1,3783 @@
+{
+  "src/lib.rs": [
+    {
+      "line": 1,
+      "source": "//! Two implementations of the same three data-structure contracts.",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 2,
+      "source": "#![forbid(unsafe_code)]",
+      "explanation": "Crate-level attribute: reject unsafe Rust anywhere in this library, including its modules."
+    },
+    {
+      "line": 4,
+      "source": "pub mod contracts;",
+      "explanation": "Declare and export this library module; Rust loads its matching source file."
+    },
+    {
+      "line": 5,
+      "source": "pub mod manual_map;",
+      "explanation": "Declare and export this library module; Rust loads its matching source file."
+    },
+    {
+      "line": 6,
+      "source": "pub mod manual_queue;",
+      "explanation": "Declare and export this library module; Rust loads its matching source file."
+    },
+    {
+      "line": 7,
+      "source": "pub mod manual_stack;",
+      "explanation": "Declare and export this library module; Rust loads its matching source file."
+    },
+    {
+      "line": 8,
+      "source": "pub mod std_impl;",
+      "explanation": "Declare and export this library module; Rust loads its matching source file."
+    }
+  ],
+  "src/contracts.rs": [
+    {
+      "line": 1,
+      "source": "//! Shared behavior: callers can switch implementations without changing operations.",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 3,
+      "source": "/// A last-in, first-out collection.",
+      "explanation": "Item documentation: describes the public behavior of the following trait."
+    },
+    {
+      "line": 4,
+      "source": "pub trait Stack<T>: Default {",
+      "explanation": "Define the public Stack<T>: behavior contract. Default permits empty construction; method signatures specify the required API."
+    },
+    {
+      "line": 5,
+      "source": "    fn push(&mut self, value: T);",
+      "explanation": "Mutably borrow the stack and take ownership of a new value; return unit. This is a required trait signature with no body here."
+    },
+    {
+      "line": 6,
+      "source": "    fn pop(&mut self) -> Option<T>;",
+      "explanation": "Mutably borrow the stack and return a removed owned value or None. This is a required trait signature with no body here."
+    },
+    {
+      "line": 7,
+      "source": "    fn peek(&self) -> Option<&T>;",
+      "explanation": "Borrow the stack read-only and return a possible shared reference to its top. This is a required trait signature with no body here."
+    },
+    {
+      "line": 8,
+      "source": "    fn len(&self) -> usize;",
+      "explanation": "Read the structure and return its entry count as usize. This is a required trait signature with no body here."
+    },
+    {
+      "line": 9,
+      "source": "    fn clear(&mut self);",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit. This is a required trait signature with no body here."
+    },
+    {
+      "line": 10,
+      "source": "    fn is_empty(&self) -> bool {",
+      "explanation": "Provide a reusable default method: inspect the collection without changing it and return a boolean."
+    },
+    {
+      "line": 11,
+      "source": "        self.len() == 0",
+      "explanation": "Return whether the count is zero. No trailing semicolon: this expression is the return value."
+    },
+    {
+      "line": 12,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 13,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 15,
+      "source": "/// A first-in, first-out collection.",
+      "explanation": "Item documentation: describes the public behavior of the following trait."
+    },
+    {
+      "line": 16,
+      "source": "pub trait Queue<T>: Default {",
+      "explanation": "Define the public Queue<T>: behavior contract. Default permits empty construction; method signatures specify the required API."
+    },
+    {
+      "line": 17,
+      "source": "    fn enqueue(&mut self, value: T);",
+      "explanation": "Mutably borrow the queue and take ownership of a value at its back. This is a required trait signature with no body here."
+    },
+    {
+      "line": 18,
+      "source": "    fn dequeue(&mut self) -> Option<T>;",
+      "explanation": "Mutably borrow the queue and return its oldest remaining owned value or None. This is a required trait signature with no body here."
+    },
+    {
+      "line": 19,
+      "source": "    fn front(&self) -> Option<&T>;",
+      "explanation": "Borrow the queue read-only and return a possible shared reference to its front. This is a required trait signature with no body here."
+    },
+    {
+      "line": 20,
+      "source": "    fn len(&self) -> usize;",
+      "explanation": "Read the structure and return its entry count as usize. This is a required trait signature with no body here."
+    },
+    {
+      "line": 21,
+      "source": "    fn clear(&mut self);",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit. This is a required trait signature with no body here."
+    },
+    {
+      "line": 22,
+      "source": "    fn is_empty(&self) -> bool {",
+      "explanation": "Provide a reusable default method: inspect the collection without changing it and return a boolean."
+    },
+    {
+      "line": 23,
+      "source": "        self.len() == 0",
+      "explanation": "Return whether the count is zero. No trailing semicolon: this expression is the return value."
+    },
+    {
+      "line": 24,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 25,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 27,
+      "source": "/// Unique keys, replacement on duplicate insertion, and sorted traversal.",
+      "explanation": "Item documentation: describes the public behavior of the following trait."
+    },
+    {
+      "line": 28,
+      "source": "pub trait Dictionary<K: Ord, V>: Default {",
+      "explanation": "Define the public Dictionary<K: behavior contract. Default permits empty construction; method signatures specify the required API."
+    },
+    {
+      "line": 29,
+      "source": "    fn insert(&mut self, key: K, value: V) -> Option<V>;",
+      "explanation": "Take ownership of a key/value pair; return the old owned value only when replacing an existing key. This is a required trait signature with no body here."
+    },
+    {
+      "line": 30,
+      "source": "    fn get(&self, key: &K) -> Option<&V>;",
+      "explanation": "Borrow the search key and structure; return a possible shared reference to the stored value. This is a required trait signature with no body here."
+    },
+    {
+      "line": 31,
+      "source": "    fn remove(&mut self, key: &K) -> Option<V>;",
+      "explanation": "Borrow the search key, mutate the structure, and return a removed owned value or None. This is a required trait signature with no body here."
+    },
+    {
+      "line": 32,
+      "source": "    fn visit<F: FnMut(&K, &V)>(&self, visitor: F);",
+      "explanation": "Borrow the dictionary and accept a FnMut callback to receive key/value references in order. This is a required trait signature with no body here."
+    },
+    {
+      "line": 33,
+      "source": "    fn len(&self) -> usize;",
+      "explanation": "Read the structure and return its entry count as usize. This is a required trait signature with no body here."
+    },
+    {
+      "line": 34,
+      "source": "    fn clear(&mut self);",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit. This is a required trait signature with no body here."
+    },
+    {
+      "line": 35,
+      "source": "    fn contains_key(&self, key: &K) -> bool {",
+      "explanation": "Default membership method: borrow a key and return whether it has an associated value."
+    },
+    {
+      "line": 36,
+      "source": "        self.get(key).is_some()",
+      "explanation": "Reuse get; return true for Some and false for None, without removing the value."
+    },
+    {
+      "line": 37,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 38,
+      "source": "    fn is_empty(&self) -> bool {",
+      "explanation": "Provide a reusable default method: inspect the collection without changing it and return a boolean."
+    },
+    {
+      "line": 39,
+      "source": "        self.len() == 0",
+      "explanation": "Return whether the count is zero. No trailing semicolon: this expression is the return value."
+    },
+    {
+      "line": 40,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 41,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    }
+  ],
+  "src/std_impl.rs": [
+    {
+      "line": 1,
+      "source": "//! Adapters around Rust's standard collections; no external crates are needed.",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 2,
+      "source": "use crate::contracts::{Dictionary, Queue, Stack};",
+      "explanation": "Import all three contracts before implementing them for the adapters."
+    },
+    {
+      "line": 3,
+      "source": "use std::collections::{BTreeMap, VecDeque};",
+      "explanation": "Import the standard ordered map and double-ended queue. Vec is already in Rust's prelude."
+    },
+    {
+      "line": 5,
+      "source": "pub struct LibraryStack<T> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 6,
+      "source": "    items: Vec<T>,",
+      "explanation": "Store stack items in a standard growable contiguous vector."
+    },
+    {
+      "line": 7,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 8,
+      "source": "impl<T> Default for LibraryStack<T> {",
+      "explanation": "Implement empty construction explicitly, avoiding an unnecessary Default requirement on stored values."
+    },
+    {
+      "line": 9,
+      "source": "    fn default() -> Self {",
+      "explanation": "Construct a fresh empty instance, returned as Self; no receiver is needed."
+    },
+    {
+      "line": 10,
+      "source": "        Self { items: Vec::new() }",
+      "explanation": "Construct an empty adapter by constructing its inner vector."
+    },
+    {
+      "line": 11,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 12,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 13,
+      "source": "impl<T> Stack<T> for LibraryStack<T> {",
+      "explanation": "Implement the named shared trait for this concrete structure. Generic bounds supply any required key ordering."
+    },
+    {
+      "line": 14,
+      "source": "    fn push(&mut self, value: T) {",
+      "explanation": "Mutably borrow the stack and take ownership of a new value; return unit."
+    },
+    {
+      "line": 15,
+      "source": "        self.items.push(value);",
+      "explanation": "Delegate addition to the inner Vec, which owns the new value."
+    },
+    {
+      "line": 16,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 17,
+      "source": "    fn pop(&mut self) -> Option<T> {",
+      "explanation": "Mutably borrow the stack and return a removed owned value or None."
+    },
+    {
+      "line": 18,
+      "source": "        self.items.pop()",
+      "explanation": "Delegate removal to Vec; forward its Option result as the method result."
+    },
+    {
+      "line": 19,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 20,
+      "source": "    fn peek(&self) -> Option<&T> {",
+      "explanation": "Borrow the stack read-only and return a possible shared reference to its top."
+    },
+    {
+      "line": 21,
+      "source": "        self.items.last()",
+      "explanation": "Borrow the Vec's final item without removing it; forward Option<&T>."
+    },
+    {
+      "line": 22,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 23,
+      "source": "    fn len(&self) -> usize {",
+      "explanation": "Read the structure and return its entry count as usize."
+    },
+    {
+      "line": 24,
+      "source": "        self.items.len()",
+      "explanation": "Return the inner collection's count."
+    },
+    {
+      "line": 25,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 26,
+      "source": "    fn clear(&mut self) {",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit."
+    },
+    {
+      "line": 27,
+      "source": "        self.items.clear();",
+      "explanation": "Remove all entries from the inner standard collection."
+    },
+    {
+      "line": 28,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 29,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 31,
+      "source": "pub struct LibraryQueue<T> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 32,
+      "source": "    items: VecDeque<T>,",
+      "explanation": "Store queue items in the standard growable ring-buffer deque."
+    },
+    {
+      "line": 33,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 34,
+      "source": "impl<T> Default for LibraryQueue<T> {",
+      "explanation": "Implement empty construction explicitly, avoiding an unnecessary Default requirement on stored values."
+    },
+    {
+      "line": 35,
+      "source": "    fn default() -> Self {",
+      "explanation": "Construct a fresh empty instance, returned as Self; no receiver is needed."
+    },
+    {
+      "line": 36,
+      "source": "        Self {",
+      "explanation": "Start a struct literal for the concrete type named by this impl block."
+    },
+    {
+      "line": 37,
+      "source": "            items: VecDeque::new(),",
+      "explanation": "Create the empty deque used as this queue's storage."
+    },
+    {
+      "line": 38,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 39,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 40,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 41,
+      "source": "impl<T> Queue<T> for LibraryQueue<T> {",
+      "explanation": "Implement the named shared trait for this concrete structure. Generic bounds supply any required key ordering."
+    },
+    {
+      "line": 42,
+      "source": "    fn enqueue(&mut self, value: T) {",
+      "explanation": "Mutably borrow the queue and take ownership of a value at its back."
+    },
+    {
+      "line": 43,
+      "source": "        self.items.push_back(value);",
+      "explanation": "Delegate insertion at the deque's back to preserve FIFO order."
+    },
+    {
+      "line": 44,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 45,
+      "source": "    fn dequeue(&mut self) -> Option<T> {",
+      "explanation": "Mutably borrow the queue and return its oldest remaining owned value or None."
+    },
+    {
+      "line": 46,
+      "source": "        self.items.pop_front()",
+      "explanation": "Delegate removal from the deque's front; forward its owned Option result."
+    },
+    {
+      "line": 47,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 48,
+      "source": "    fn front(&self) -> Option<&T> {",
+      "explanation": "Borrow the queue read-only and return a possible shared reference to its front."
+    },
+    {
+      "line": 49,
+      "source": "        self.items.front()",
+      "explanation": "Borrow the deque's first item without removing it."
+    },
+    {
+      "line": 50,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 51,
+      "source": "    fn len(&self) -> usize {",
+      "explanation": "Read the structure and return its entry count as usize."
+    },
+    {
+      "line": 52,
+      "source": "        self.items.len()",
+      "explanation": "Return the inner collection's count."
+    },
+    {
+      "line": 53,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 54,
+      "source": "    fn clear(&mut self) {",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit."
+    },
+    {
+      "line": 55,
+      "source": "        self.items.clear();",
+      "explanation": "Remove all entries from the inner standard collection."
+    },
+    {
+      "line": 56,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 57,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 59,
+      "source": "pub struct LibraryDictionary<K, V> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 60,
+      "source": "    items: BTreeMap<K, V>,",
+      "explanation": "Store key/value entries in the standard ordered B-tree map."
+    },
+    {
+      "line": 61,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 62,
+      "source": "impl<K, V> Default for LibraryDictionary<K, V> {",
+      "explanation": "Implement empty construction explicitly, avoiding an unnecessary Default requirement on stored values."
+    },
+    {
+      "line": 63,
+      "source": "    fn default() -> Self {",
+      "explanation": "Construct a fresh empty instance, returned as Self; no receiver is needed."
+    },
+    {
+      "line": 64,
+      "source": "        Self {",
+      "explanation": "Start a struct literal for the concrete type named by this impl block."
+    },
+    {
+      "line": 65,
+      "source": "            items: BTreeMap::new(),",
+      "explanation": "Create the empty B-tree map used as this dictionary's storage."
+    },
+    {
+      "line": 66,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 67,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 68,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 69,
+      "source": "impl<K: Ord, V> Dictionary<K, V> for LibraryDictionary<K, V> {",
+      "explanation": "Implement the named shared trait for this concrete structure. Generic bounds supply any required key ordering."
+    },
+    {
+      "line": 70,
+      "source": "    fn insert(&mut self, key: K, value: V) -> Option<V> {",
+      "explanation": "Take ownership of a key/value pair; return the old owned value only when replacing an existing key."
+    },
+    {
+      "line": 71,
+      "source": "        self.items.insert(key, value)",
+      "explanation": "Delegate key insertion/replacement to BTreeMap; forward its previous-value result."
+    },
+    {
+      "line": 72,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 73,
+      "source": "    fn get(&self, key: &K) -> Option<&V> {",
+      "explanation": "Borrow the search key and structure; return a possible shared reference to the stored value."
+    },
+    {
+      "line": 74,
+      "source": "        self.items.get(key)",
+      "explanation": "Delegate borrowed lookup to BTreeMap; forward the borrowed Option result."
+    },
+    {
+      "line": 75,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 76,
+      "source": "    fn remove(&mut self, key: &K) -> Option<V> {",
+      "explanation": "Borrow the search key, mutate the structure, and return a removed owned value or None."
+    },
+    {
+      "line": 77,
+      "source": "        self.items.remove(key)",
+      "explanation": "Delegate key deletion to BTreeMap; forward its removed owned value."
+    },
+    {
+      "line": 78,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 79,
+      "source": "    fn visit<F: FnMut(&K, &V)>(&self, mut visitor: F) {",
+      "explanation": "Borrow the dictionary and accept a FnMut callback to receive key/value references in order."
+    },
+    {
+      "line": 80,
+      "source": "        for (key, value) in &self.items {",
+      "explanation": "Borrow and iterate through the BTreeMap entries; its iterator yields sorted keys."
+    },
+    {
+      "line": 81,
+      "source": "            visitor(key, value);",
+      "explanation": "Invoke the caller's mutable callback with the borrowed pair."
+    },
+    {
+      "line": 82,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 83,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 84,
+      "source": "    fn len(&self) -> usize {",
+      "explanation": "Read the structure and return its entry count as usize."
+    },
+    {
+      "line": 85,
+      "source": "        self.items.len()",
+      "explanation": "Return the inner collection's count."
+    },
+    {
+      "line": 86,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 87,
+      "source": "    fn clear(&mut self) {",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit."
+    },
+    {
+      "line": 88,
+      "source": "        self.items.clear();",
+      "explanation": "Remove all entries from the inner standard collection."
+    },
+    {
+      "line": 89,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 90,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    }
+  ],
+  "src/manual_stack.rs": [
+    {
+      "line": 1,
+      "source": "//! A manually linked stack. Each node owns the node below it.",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 2,
+      "source": "use crate::contracts::Stack;",
+      "explanation": "Bring the stack trait into scope, including its methods used during cleanup."
+    },
+    {
+      "line": 4,
+      "source": "struct Node<T> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 5,
+      "source": "    value: T,",
+      "explanation": "A stored item of generic type T. The node owns it; no Copy or Clone bound is required."
+    },
+    {
+      "line": 6,
+      "source": "    next: Option<Box<Node<T>>>,",
+      "explanation": "Optional owned link to the following node. None terminates the list."
+    },
+    {
+      "line": 7,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 8,
+      "source": "pub struct ManualStack<T> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 9,
+      "source": "    head: Option<Box<Node<T>>>,",
+      "explanation": "Optional first node: stack top or queue front. It owns the entire linked chain."
+    },
+    {
+      "line": 10,
+      "source": "    size: usize,",
+      "explanation": "Cache the number of stored items so length checks do not need a traversal."
+    },
+    {
+      "line": 11,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 12,
+      "source": "impl<T> Default for ManualStack<T> {",
+      "explanation": "Implement empty construction explicitly, avoiding an unnecessary Default requirement on stored values."
+    },
+    {
+      "line": 13,
+      "source": "    fn default() -> Self {",
+      "explanation": "Construct a fresh empty instance, returned as Self; no receiver is needed."
+    },
+    {
+      "line": 14,
+      "source": "        Self {",
+      "explanation": "Start a struct literal for the concrete type named by this impl block."
+    },
+    {
+      "line": 15,
+      "source": "            head: None,",
+      "explanation": "Initialize the list with no first node."
+    },
+    {
+      "line": 16,
+      "source": "            size: 0,",
+      "explanation": "Initialize the cached item count to zero."
+    },
+    {
+      "line": 17,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 18,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 19,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 20,
+      "source": "impl<T> Stack<T> for ManualStack<T> {",
+      "explanation": "Implement the named shared trait for this concrete structure. Generic bounds supply any required key ordering."
+    },
+    {
+      "line": 21,
+      "source": "    fn push(&mut self, value: T) {",
+      "explanation": "Mutably borrow the stack and take ownership of a new value; return unit."
+    },
+    {
+      "line": 22,
+      "source": "        let next = self.head.take();",
+      "explanation": "Move the old head out while replacing it with None; save that old chain as next."
+    },
+    {
+      "line": 23,
+      "source": "        self.head = Some(Box::new(Node { value, next }));",
+      "explanation": "Allocate a new node that owns value and the previous head; make it the new stack top."
+    },
+    {
+      "line": 24,
+      "source": "        self.size += 1;",
+      "explanation": "One new item was linked successfully; increment the cached count exactly once."
+    },
+    {
+      "line": 25,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 26,
+      "source": "    fn pop(&mut self) -> Option<T> {",
+      "explanation": "Mutably borrow the stack and return a removed owned value or None."
+    },
+    {
+      "line": 27,
+      "source": "        let node = self.head.take()?;",
+      "explanation": "Take the first owned node. If the head is None, ? returns None immediately and leaves size unchanged."
+    },
+    {
+      "line": 28,
+      "source": "        self.head = node.next;",
+      "explanation": "Move the detached node's next link into head so the remaining chain stays owned."
+    },
+    {
+      "line": 29,
+      "source": "        self.size -= 1;",
+      "explanation": "Successful removal guarantees at least one item existed; decrement the cached count."
+    },
+    {
+      "line": 30,
+      "source": "        Some(node.value)",
+      "explanation": "Move the removed node's value to the caller as the block result."
+    },
+    {
+      "line": 31,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 32,
+      "source": "    fn peek(&self) -> Option<&T> {",
+      "explanation": "Borrow the stack read-only and return a possible shared reference to its top."
+    },
+    {
+      "line": 33,
+      "source": "        self.head.as_ref().map(|node| &node.value)",
+      "explanation": "Borrow the head and transform a present node into a reference to its value; None remains None."
+    },
+    {
+      "line": 34,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 35,
+      "source": "    fn len(&self) -> usize {",
+      "explanation": "Read the structure and return its entry count as usize."
+    },
+    {
+      "line": 36,
+      "source": "        self.size",
+      "explanation": "Return the cached count without traversal or mutation."
+    },
+    {
+      "line": 37,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 38,
+      "source": "    fn clear(&mut self) {",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit."
+    },
+    {
+      "line": 39,
+      "source": "        while self.pop().is_some() {}",
+      "explanation": "Repeatedly remove and drop one stack value until empty; the empty body has no extra work."
+    },
+    {
+      "line": 40,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 41,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 42,
+      "source": "impl<T> Drop for ManualStack<T> {",
+      "explanation": "Implement automatic cleanup when this owner leaves scope or is explicitly dropped."
+    },
+    {
+      "line": 43,
+      "source": "    fn drop(&mut self) {",
+      "explanation": "Automatic Drop hook, borrowing the soon-to-be-destroyed instance mutably."
+    },
+    {
+      "line": 44,
+      "source": "        self.clear();",
+      "explanation": "Reuse iterative collection cleanup during automatic destruction."
+    },
+    {
+      "line": 45,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 46,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    }
+  ],
+  "src/manual_queue.rs": [
+    {
+      "line": 1,
+      "source": "//! A simple linked FIFO queue: enqueue is O(n), dequeue is O(1).",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 2,
+      "source": "use crate::contracts::Queue;",
+      "explanation": "Bring the queue trait into scope, including its methods used during cleanup."
+    },
+    {
+      "line": 4,
+      "source": "struct Node<T> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 5,
+      "source": "    value: T,",
+      "explanation": "A stored item of generic type T. The node owns it; no Copy or Clone bound is required."
+    },
+    {
+      "line": 6,
+      "source": "    next: Option<Box<Node<T>>>,",
+      "explanation": "Optional owned link to the following node. None terminates the list."
+    },
+    {
+      "line": 7,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 8,
+      "source": "pub struct ManualQueue<T> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 9,
+      "source": "    head: Option<Box<Node<T>>>,",
+      "explanation": "Optional first node: stack top or queue front. It owns the entire linked chain."
+    },
+    {
+      "line": 10,
+      "source": "    size: usize,",
+      "explanation": "Cache the number of stored items so length checks do not need a traversal."
+    },
+    {
+      "line": 11,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 12,
+      "source": "impl<T> Default for ManualQueue<T> {",
+      "explanation": "Implement empty construction explicitly, avoiding an unnecessary Default requirement on stored values."
+    },
+    {
+      "line": 13,
+      "source": "    fn default() -> Self {",
+      "explanation": "Construct a fresh empty instance, returned as Self; no receiver is needed."
+    },
+    {
+      "line": 14,
+      "source": "        Self {",
+      "explanation": "Start a struct literal for the concrete type named by this impl block."
+    },
+    {
+      "line": 15,
+      "source": "            head: None,",
+      "explanation": "Initialize the list with no first node."
+    },
+    {
+      "line": 16,
+      "source": "            size: 0,",
+      "explanation": "Initialize the cached item count to zero."
+    },
+    {
+      "line": 17,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 18,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 19,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 20,
+      "source": "impl<T> Queue<T> for ManualQueue<T> {",
+      "explanation": "Implement the named shared trait for this concrete structure. Generic bounds supply any required key ordering."
+    },
+    {
+      "line": 21,
+      "source": "    fn enqueue(&mut self, value: T) {",
+      "explanation": "Mutably borrow the queue and take ownership of a value at its back."
+    },
+    {
+      "line": 22,
+      "source": "        // Walk through mutable links until reaching the empty tail link.",
+      "explanation": "Implementation comment: explains the intention of the following code; comments do not run."
+    },
+    {
+      "line": 23,
+      "source": "        let mut link = &mut self.head;",
+      "explanation": "Create an exclusive cursor to the head link. The cursor will move to successive next links."
+    },
+    {
+      "line": 24,
+      "source": "        while let Some(node) = link {",
+      "explanation": "Continue while the mutable link has a node; bind its mutable node reference, then advance toward the empty tail link."
+    },
+    {
+      "line": 25,
+      "source": "            link = &mut node.next;",
+      "explanation": "Advance the exclusive cursor to the next Option field; do not move or clone the node."
+    },
+    {
+      "line": 26,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 27,
+      "source": "        *link = Some(Box::new(Node { value, next: None }));",
+      "explanation": "Write a new terminal node into the empty link, handling both the empty-list and tail-insertion cases."
+    },
+    {
+      "line": 28,
+      "source": "        self.size += 1;",
+      "explanation": "One new item was linked successfully; increment the cached count exactly once."
+    },
+    {
+      "line": 29,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 30,
+      "source": "    fn dequeue(&mut self) -> Option<T> {",
+      "explanation": "Mutably borrow the queue and return its oldest remaining owned value or None."
+    },
+    {
+      "line": 31,
+      "source": "        let node = self.head.take()?;",
+      "explanation": "Take the first owned node. If the head is None, ? returns None immediately and leaves size unchanged."
+    },
+    {
+      "line": 32,
+      "source": "        self.head = node.next;",
+      "explanation": "Move the detached node's next link into head so the remaining chain stays owned."
+    },
+    {
+      "line": 33,
+      "source": "        self.size -= 1;",
+      "explanation": "Successful removal guarantees at least one item existed; decrement the cached count."
+    },
+    {
+      "line": 34,
+      "source": "        Some(node.value)",
+      "explanation": "Move the removed node's value to the caller as the block result."
+    },
+    {
+      "line": 35,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 36,
+      "source": "    fn front(&self) -> Option<&T> {",
+      "explanation": "Borrow the queue read-only and return a possible shared reference to its front."
+    },
+    {
+      "line": 37,
+      "source": "        self.head.as_ref().map(|node| &node.value)",
+      "explanation": "Borrow the head and transform a present node into a reference to its value; None remains None."
+    },
+    {
+      "line": 38,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 39,
+      "source": "    fn len(&self) -> usize {",
+      "explanation": "Read the structure and return its entry count as usize."
+    },
+    {
+      "line": 40,
+      "source": "        self.size",
+      "explanation": "Return the cached count without traversal or mutation."
+    },
+    {
+      "line": 41,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 42,
+      "source": "    fn clear(&mut self) {",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit."
+    },
+    {
+      "line": 43,
+      "source": "        while self.dequeue().is_some() {}",
+      "explanation": "Repeatedly remove and drop one queue value until empty; each removal detaches one node."
+    },
+    {
+      "line": 44,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 45,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 46,
+      "source": "impl<T> Drop for ManualQueue<T> {",
+      "explanation": "Implement automatic cleanup when this owner leaves scope or is explicitly dropped."
+    },
+    {
+      "line": 47,
+      "source": "    fn drop(&mut self) {",
+      "explanation": "Automatic Drop hook, borrowing the soon-to-be-destroyed instance mutably."
+    },
+    {
+      "line": 48,
+      "source": "        self.clear();",
+      "explanation": "Reuse iterative collection cleanup during automatic destruction."
+    },
+    {
+      "line": 49,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 50,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    }
+  ],
+  "src/manual_map.rs": [
+    {
+      "line": 1,
+      "source": "//! An unbalanced binary search tree: left keys < key < right keys.",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 2,
+      "source": "use crate::contracts::Dictionary;",
+      "explanation": "Bring the dictionary trait into scope so this module can implement its required methods."
+    },
+    {
+      "line": 3,
+      "source": "use std::cmp::Ordering;",
+      "explanation": "Import the comparison enum with Less, Equal, and Greater variants."
+    },
+    {
+      "line": 5,
+      "source": "type Link<K, V> = Option<Box<Node<K, V>>>;",
+      "explanation": "Create a type alias, not a new type: an absent link or a uniquely owned boxed tree node."
+    },
+    {
+      "line": 6,
+      "source": "struct Node<K, V> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 7,
+      "source": "    key: K,",
+      "explanation": "This node owns its key of generic type K."
+    },
+    {
+      "line": 8,
+      "source": "    value: V,",
+      "explanation": "This node owns the value associated with its key."
+    },
+    {
+      "line": 9,
+      "source": "    left: Link<K, V>,",
+      "explanation": "Owned link to the subtree containing keys smaller than this node's key."
+    },
+    {
+      "line": 10,
+      "source": "    right: Link<K, V>,",
+      "explanation": "Owned link to the subtree containing keys larger than this node's key."
+    },
+    {
+      "line": 11,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 12,
+      "source": "pub struct ManualDictionary<K, V> {",
+      "explanation": "Define a record type. Generic parameters choose item/key/value types; pub exposes the type while its fields remain private."
+    },
+    {
+      "line": 13,
+      "source": "    root: Link<K, V>,",
+      "explanation": "Owned root link. None represents an empty dictionary."
+    },
+    {
+      "line": 14,
+      "source": "    size: usize,",
+      "explanation": "Cache the number of stored items so length checks do not need a traversal."
+    },
+    {
+      "line": 15,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 16,
+      "source": "impl<K, V> Default for ManualDictionary<K, V> {",
+      "explanation": "Implement empty construction explicitly, avoiding an unnecessary Default requirement on stored values."
+    },
+    {
+      "line": 17,
+      "source": "    fn default() -> Self {",
+      "explanation": "Construct a fresh empty instance, returned as Self; no receiver is needed."
+    },
+    {
+      "line": 18,
+      "source": "        Self {",
+      "explanation": "Start a struct literal for the concrete type named by this impl block."
+    },
+    {
+      "line": 19,
+      "source": "            root: None,",
+      "explanation": "Initialize the tree with no root node."
+    },
+    {
+      "line": 20,
+      "source": "            size: 0,",
+      "explanation": "Initialize the cached item count to zero."
+    },
+    {
+      "line": 21,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 22,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 23,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 25,
+      "source": "// Detach the smallest node; its right child takes its former position.",
+      "explanation": "Implementation comment: explains the intention of the following code; comments do not run."
+    },
+    {
+      "line": 26,
+      "source": "fn take_min<K, V>(link: &mut Link<K, V>) -> Box<Node<K, V>> {",
+      "explanation": "Private helper: mutate a nonempty subtree link and return its detached smallest boxed node."
+    },
+    {
+      "line": 27,
+      "source": "    if link.as_ref().expect(\"nonempty subtree\").left.is_some() {",
+      "explanation": "Borrow the current node and check whether a smaller node exists on its left. The helper requires a nonempty subtree."
+    },
+    {
+      "line": 28,
+      "source": "        return take_min(&mut link.as_mut().unwrap().left);",
+      "explanation": "Recurse through the left link. unwrap is valid because the previous condition established this link is Some."
+    },
+    {
+      "line": 29,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 30,
+      "source": "    let mut node = link.take().expect(\"nonempty subtree\");",
+      "explanation": "Detach the smallest node. expect checks the internal nonempty-subtree invariant, not an external key lookup."
+    },
+    {
+      "line": 31,
+      "source": "    *link = node.right.take();",
+      "explanation": "Promote the smallest node's right child into its old position, preserving that subtree."
+    },
+    {
+      "line": 32,
+      "source": "    node",
+      "explanation": "Return the detached boxed node as the final expression."
+    },
+    {
+      "line": 33,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 35,
+      "source": "fn remove_node<K: Ord, V>(link: &mut Link<K, V>, key: &K) -> Option<V> {",
+      "explanation": "Recursive helper: mutate an owned subtree link and search by borrowed ordered key; return a possible removed value."
+    },
+    {
+      "line": 36,
+      "source": "    match key.cmp(&link.as_ref()?.key) {",
+      "explanation": "Compare the search key with the borrowed node key. An absent link causes ? to return None."
+    },
+    {
+      "line": 37,
+      "source": "        Ordering::Less => remove_node(&mut link.as_mut()?.left, key),",
+      "explanation": "Smaller key: recurse into the left link and return that call's result."
+    },
+    {
+      "line": 38,
+      "source": "        Ordering::Greater => remove_node(&mut link.as_mut()?.right, key),",
+      "explanation": "Larger key: recurse into the right link and return that call's result."
+    },
+    {
+      "line": 39,
+      "source": "        Ordering::Equal => {",
+      "explanation": "The keys match; this branch updates or removes the current node, depending on the enclosing function."
+    },
+    {
+      "line": 40,
+      "source": "            let mut node = link.take()?;",
+      "explanation": "Detach the matched node from its parent/root link so its owned fields can be rearranged."
+    },
+    {
+      "line": 41,
+      "source": "            match (node.left.take(), node.right.take()) {",
+      "explanation": "Detach both child links and match their tuple to select the appropriate deletion case."
+    },
+    {
+      "line": 42,
+      "source": "                (None, right) => {",
+      "explanation": "No left child: this also covers a leaf if right is None."
+    },
+    {
+      "line": 43,
+      "source": "                    *link = right;",
+      "explanation": "The right child (possibly absent) takes the removed node's position."
+    },
+    {
+      "line": 44,
+      "source": "                    Some(node.value)",
+      "explanation": "Move the removed node's value to the caller as the block result."
+    },
+    {
+      "line": 45,
+      "source": "                }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 46,
+      "source": "                (left, None) => {",
+      "explanation": "There is a left child and no right child; the earlier arm already handled both absent."
+    },
+    {
+      "line": 47,
+      "source": "                    *link = left;",
+      "explanation": "The left subtree takes the removed node's position."
+    },
+    {
+      "line": 48,
+      "source": "                    Some(node.value)",
+      "explanation": "Move the removed node's value to the caller as the block result."
+    },
+    {
+      "line": 49,
+      "source": "                }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 50,
+      "source": "                (left, right) => {",
+      "explanation": "Both children are present; previous match arms excluded the absent-child cases."
+    },
+    {
+      "line": 51,
+      "source": "                    let mut subtree = right;",
+      "explanation": "Make the detached right subtree mutable so its smallest node can be removed."
+    },
+    {
+      "line": 52,
+      "source": "                    let successor = take_min(&mut subtree);",
+      "explanation": "Detach the in-order successor, preserving its possible right child inside subtree."
+    },
+    {
+      "line": 53,
+      "source": "                    node.key = successor.key;",
+      "explanation": "Move the successor key into the target node. The original matched key is dropped."
+    },
+    {
+      "line": 54,
+      "source": "                    let old = std::mem::replace(&mut node.value, successor.value);",
+      "explanation": "Move in the successor value and retain the original target value for the caller."
+    },
+    {
+      "line": 55,
+      "source": "                    node.left = left;",
+      "explanation": "Reconnect the unchanged left subtree to the replacement-key node."
+    },
+    {
+      "line": 56,
+      "source": "                    node.right = subtree;",
+      "explanation": "Reconnect the right subtree after successor removal."
+    },
+    {
+      "line": 57,
+      "source": "                    *link = Some(node);",
+      "explanation": "Reattach the rebuilt node to its original parent/root link."
+    },
+    {
+      "line": 58,
+      "source": "                    Some(old)",
+      "explanation": "Return the original target value, not the successor's value."
+    },
+    {
+      "line": 59,
+      "source": "                }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 60,
+      "source": "            }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 61,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 62,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 63,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 65,
+      "source": "fn visit_node<K, V, F: FnMut(&K, &V)>(link: &Link<K, V>, visitor: &mut F) {",
+      "explanation": "Recursive helper: borrow a subtree and the same mutable callback for in-order traversal."
+    },
+    {
+      "line": 66,
+      "source": "    if let Some(node) = link {",
+      "explanation": "If the borrowed subtree is nonempty, bind a shared reference to its node; otherwise do nothing."
+    },
+    {
+      "line": 67,
+      "source": "        visit_node(&node.left, visitor);",
+      "explanation": "Visit all smaller keys first; pass along the same mutable callback."
+    },
+    {
+      "line": 68,
+      "source": "        visitor(&node.key, &node.value);",
+      "explanation": "Call the visitor with borrowed data from the current node."
+    },
+    {
+      "line": 69,
+      "source": "        visit_node(&node.right, visitor);",
+      "explanation": "Visit all larger keys last, completing in-order traversal."
+    },
+    {
+      "line": 70,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 71,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 73,
+      "source": "impl<K: Ord, V> Dictionary<K, V> for ManualDictionary<K, V> {",
+      "explanation": "Implement the named shared trait for this concrete structure. Generic bounds supply any required key ordering."
+    },
+    {
+      "line": 74,
+      "source": "    fn insert(&mut self, key: K, value: V) -> Option<V> {",
+      "explanation": "Take ownership of a key/value pair; return the old owned value only when replacing an existing key."
+    },
+    {
+      "line": 75,
+      "source": "        let mut link = &mut self.root;",
+      "explanation": "Start an exclusive link cursor at the tree root; insertion will descend without recursion."
+    },
+    {
+      "line": 76,
+      "source": "        loop {",
+      "explanation": "Repeat until insertion or replacement explicitly returns."
+    },
+    {
+      "line": 77,
+      "source": "            match link {",
+      "explanation": "Inspect the current mutable Option link: either an empty position or an existing node."
+    },
+    {
+      "line": 78,
+      "source": "                None => {",
+      "explanation": "An empty link was reached; this is the insertion position for the new key."
+    },
+    {
+      "line": 79,
+      "source": "                    *link = Some(Box::new(Node {",
+      "explanation": "Dereference the cursor and begin allocating the new node in the empty link."
+    },
+    {
+      "line": 80,
+      "source": "                        key,",
+      "explanation": "Field shorthand: move the local variable key into the field also named key."
+    },
+    {
+      "line": 81,
+      "source": "                        value,",
+      "explanation": "Field shorthand: move the local variable value into the field also named value."
+    },
+    {
+      "line": 82,
+      "source": "                        left: None,",
+      "explanation": "A newly inserted tree node begins with an empty left subtree."
+    },
+    {
+      "line": 83,
+      "source": "                        right: None,",
+      "explanation": "A newly inserted tree node begins with an empty right subtree."
+    },
+    {
+      "line": 84,
+      "source": "                    }));",
+      "explanation": "Finish the node literal, heap allocation, Some wrapper, and link-assignment statement."
+    },
+    {
+      "line": 85,
+      "source": "                    self.size += 1;",
+      "explanation": "One new item was linked successfully; increment the cached count exactly once."
+    },
+    {
+      "line": 86,
+      "source": "                    return None;",
+      "explanation": "A new key was added, so there is no previous value to return."
+    },
+    {
+      "line": 87,
+      "source": "                }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 88,
+      "source": "                Some(node) => match key.cmp(&node.key) {",
+      "explanation": "At an existing node, compare keys to descend left/right or replace an equal key's value."
+    },
+    {
+      "line": 89,
+      "source": "                    Ordering::Less => link = &mut node.left,",
+      "explanation": "Smaller key: move the mutable cursor to the left link."
+    },
+    {
+      "line": 90,
+      "source": "                    Ordering::Greater => link = &mut node.right,",
+      "explanation": "Larger key: move the mutable cursor to the right link."
+    },
+    {
+      "line": 91,
+      "source": "                    Ordering::Equal => {",
+      "explanation": "The keys match; this branch updates or removes the current node, depending on the enclosing function."
+    },
+    {
+      "line": 92,
+      "source": "                        return Some(std::mem::replace(&mut node.value, value));",
+      "explanation": "Replace the value for an existing key and return the old value. Do not increment size."
+    },
+    {
+      "line": 93,
+      "source": "                    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 94,
+      "source": "                },",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 95,
+      "source": "            }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 96,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 97,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 98,
+      "source": "    fn get(&self, key: &K) -> Option<&V> {",
+      "explanation": "Borrow the search key and structure; return a possible shared reference to the stored value."
+    },
+    {
+      "line": 99,
+      "source": "        let mut link = self.root.as_deref();",
+      "explanation": "Borrow the root as Option<&Node> rather than borrowing the Box wrapper."
+    },
+    {
+      "line": 100,
+      "source": "        while let Some(node) = link {",
+      "explanation": "Continue while a borrowed node exists; each loop compares the desired key with this node."
+    },
+    {
+      "line": 101,
+      "source": "            match key.cmp(&node.key) {",
+      "explanation": "Compare the requested key with the current node key to choose a search direction."
+    },
+    {
+      "line": 102,
+      "source": "                Ordering::Less => link = node.left.as_deref(),",
+      "explanation": "Smaller key: borrow the left node for the next iteration."
+    },
+    {
+      "line": 103,
+      "source": "                Ordering::Greater => link = node.right.as_deref(),",
+      "explanation": "Larger key: borrow the right node for the next iteration."
+    },
+    {
+      "line": 104,
+      "source": "                Ordering::Equal => return Some(&node.value),",
+      "explanation": "Found the key: return a reference tied to the dictionary borrow, without moving the value."
+    },
+    {
+      "line": 105,
+      "source": "            }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 106,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 107,
+      "source": "        None",
+      "explanation": "The search reached an absent link, so return a missing result."
+    },
+    {
+      "line": 108,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 109,
+      "source": "    fn remove(&mut self, key: &K) -> Option<V> {",
+      "explanation": "Borrow the search key, mutate the structure, and return a removed owned value or None."
+    },
+    {
+      "line": 110,
+      "source": "        let removed = remove_node(&mut self.root, key);",
+      "explanation": "Delegate structural deletion to the helper; retain its possible owned value."
+    },
+    {
+      "line": 111,
+      "source": "        if removed.is_some() {",
+      "explanation": "Only decrement size if a key was actually removed."
+    },
+    {
+      "line": 112,
+      "source": "            self.size -= 1;",
+      "explanation": "Successful removal guarantees at least one item existed; decrement the cached count."
+    },
+    {
+      "line": 113,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 114,
+      "source": "        removed",
+      "explanation": "Return the deletion result unchanged, preserving ownership of its value."
+    },
+    {
+      "line": 115,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 116,
+      "source": "    fn visit<F: FnMut(&K, &V)>(&self, mut visitor: F) {",
+      "explanation": "Borrow the dictionary and accept a FnMut callback to receive key/value references in order."
+    },
+    {
+      "line": 117,
+      "source": "        visit_node(&self.root, &mut visitor);",
+      "explanation": "Start the recursive ordered traversal with one mutable visitor instance."
+    },
+    {
+      "line": 118,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 119,
+      "source": "    fn len(&self) -> usize {",
+      "explanation": "Read the structure and return its entry count as usize."
+    },
+    {
+      "line": 120,
+      "source": "        self.size",
+      "explanation": "Return the cached count without traversal or mutation."
+    },
+    {
+      "line": 121,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 122,
+      "source": "    fn clear(&mut self) {",
+      "explanation": "Mutably borrow the structure and remove all stored values; return unit."
+    },
+    {
+      "line": 123,
+      "source": "        self.clear_nodes();",
+      "explanation": "Run the bound-free iterative cleanup helper, which also resets size."
+    },
+    {
+      "line": 124,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 125,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 127,
+      "source": "impl<K, V> ManualDictionary<K, V> {",
+      "explanation": "Start an inherent implementation block for private methods on this type, independent of a shared trait."
+    },
+    {
+      "line": 128,
+      "source": "    // Rotate left children upward, then drop child-free nodes iteratively.",
+      "explanation": "Implementation comment: explains the intention of the following code; comments do not run."
+    },
+    {
+      "line": 129,
+      "source": "    fn clear_nodes(&mut self) {",
+      "explanation": "Private, bound-free cleanup helper: no key comparisons are needed to release the tree."
+    },
+    {
+      "line": 130,
+      "source": "        while let Some(mut node) = self.root.take() {",
+      "explanation": "Detach the current owned root; continue until no node remains."
+    },
+    {
+      "line": 131,
+      "source": "            if let Some(mut left) = node.left.take() {",
+      "explanation": "Detach a left child if present; it will be promoted to preserve the remaining tree."
+    },
+    {
+      "line": 132,
+      "source": "                node.left = left.right.take();",
+      "explanation": "Move the promoted child's former right subtree into the old root's left link."
+    },
+    {
+      "line": 133,
+      "source": "                left.right = Some(node);",
+      "explanation": "Attach the old root as the promoted child's right child; all remaining nodes are still owned."
+    },
+    {
+      "line": 134,
+      "source": "                self.root = Some(left);",
+      "explanation": "Make the promoted child the temporary root and continue cleanup."
+    },
+    {
+      "line": 135,
+      "source": "            } else {",
+      "explanation": "Choose the alternative branch when there is no left child."
+    },
+    {
+      "line": 136,
+      "source": "                self.root = node.right.take();",
+      "explanation": "Detach/promote the right link. The old root now has no children and drops without recursively dropping descendants."
+    },
+    {
+      "line": 137,
+      "source": "            }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 138,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 139,
+      "source": "        self.size = 0;",
+      "explanation": "All nodes have been removed; reset the cached count."
+    },
+    {
+      "line": 140,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 141,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 142,
+      "source": "impl<K, V> Drop for ManualDictionary<K, V> {",
+      "explanation": "Implement automatic cleanup when this owner leaves scope or is explicitly dropped."
+    },
+    {
+      "line": 143,
+      "source": "    fn drop(&mut self) {",
+      "explanation": "Automatic Drop hook, borrowing the soon-to-be-destroyed instance mutably."
+    },
+    {
+      "line": 144,
+      "source": "        self.clear_nodes();",
+      "explanation": "Run the bound-free iterative cleanup helper, which also resets size."
+    },
+    {
+      "line": 145,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 146,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    }
+  ],
+  "src/main.rs": [
+    {
+      "line": 1,
+      "source": "//! Run identical examples with both implementations.",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 2,
+      "source": "use rust_structures_assignment::contracts::{Dictionary, Queue, Stack};",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 3,
+      "source": "use rust_structures_assignment::manual_map::ManualDictionary;",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 4,
+      "source": "use rust_structures_assignment::manual_queue::ManualQueue;",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 5,
+      "source": "use rust_structures_assignment::manual_stack::ManualStack;",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 6,
+      "source": "use rust_structures_assignment::std_impl::{LibraryDictionary, LibraryQueue, LibraryStack};",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 8,
+      "source": "fn demonstrate<S, Q, D>(label: &str)",
+      "explanation": "Generic console example: S/Q/D select three implementation types; label is a borrowed string."
+    },
+    {
+      "line": 9,
+      "source": "where",
+      "explanation": "Begin explicit generic trait bounds for the demonstration function."
+    },
+    {
+      "line": 10,
+      "source": "    S: Stack<i32>,",
+      "explanation": "Require the selected stack implementation to store 32-bit integers."
+    },
+    {
+      "line": 11,
+      "source": "    Q: Queue<i32>,",
+      "explanation": "Require the selected queue implementation to store 32-bit integers."
+    },
+    {
+      "line": 12,
+      "source": "    D: Dictionary<&'static str, &'static str>,",
+      "explanation": "Require a dictionary of long-lived string references; the demonstration uses string literals."
+    },
+    {
+      "line": 13,
+      "source": "{",
+      "explanation": "Open a block; local owners created here are dropped when its scope ends."
+    },
+    {
+      "line": 14,
+      "source": "    println!(\"\\n=== {label} ===\");",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 15,
+      "source": "    let mut stack = S::default();",
+      "explanation": "Construct an empty instance of the selected stack type; mut allows its operations to change it."
+    },
+    {
+      "line": 16,
+      "source": "    let mut queue = Q::default();",
+      "explanation": "Construct an empty instance of the selected queue type."
+    },
+    {
+      "line": 17,
+      "source": "    for value in [10, 20, 30] {",
+      "explanation": "Iterate over a fixed array in this order; each integer is Copy and can be used in both structures."
+    },
+    {
+      "line": 18,
+      "source": "        stack.push(value);",
+      "explanation": "Add this integer to the selected stack implementation."
+    },
+    {
+      "line": 19,
+      "source": "        queue.enqueue(value);",
+      "explanation": "Add the same integer to the selected queue implementation."
+    },
+    {
+      "line": 20,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 21,
+      "source": "    println!(\"Stack top: {:?}; size: {}\", stack.peek(), stack.len());",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 22,
+      "source": "    print!(\"Stack removal order:\");",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 23,
+      "source": "    while let Some(value) = stack.pop() {",
+      "explanation": "Repeatedly remove stack items; stop when pop returns None."
+    },
+    {
+      "line": 24,
+      "source": "        print!(\" {value}\");",
+      "explanation": "Print the removed integer with a preceding space, using captured-variable formatting and no newline."
+    },
+    {
+      "line": 25,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 26,
+      "source": "    println!();",
+      "explanation": "Print a newline to finish the sequence already written with print!."
+    },
+    {
+      "line": 27,
+      "source": "    println!(\"Queue front: {:?}; size: {}\", queue.front(), queue.len());",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 28,
+      "source": "    print!(\"Queue removal order:\");",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 29,
+      "source": "    while let Some(value) = queue.dequeue() {",
+      "explanation": "Repeatedly remove queue items; stop when dequeue returns None."
+    },
+    {
+      "line": 30,
+      "source": "        print!(\" {value}\");",
+      "explanation": "Print the removed integer with a preceding space, using captured-variable formatting and no newline."
+    },
+    {
+      "line": 31,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 32,
+      "source": "    println!();",
+      "explanation": "Print a newline to finish the sequence already written with print!."
+    },
+    {
+      "line": 33,
+      "source": "    println!(",
+      "explanation": "Start a multi-line print macro; the format string and arguments follow."
+    },
+    {
+      "line": 34,
+      "source": "        \"Empty removal: stack={:?}, queue={:?}\",",
+      "explanation": "Format-string argument for the surrounding print macro. Its placeholders are filled by the following expressions."
+    },
+    {
+      "line": 35,
+      "source": "        stack.pop(),",
+      "explanation": "Supply the empty stack removal result to the print macro: None."
+    },
+    {
+      "line": 36,
+      "source": "        queue.dequeue()",
+      "explanation": "Supply the empty queue removal result to the print macro: None."
+    },
+    {
+      "line": 37,
+      "source": "    );",
+      "explanation": "Close the multi-line macro/function call and terminate the statement."
+    },
+    {
+      "line": 38,
+      "source": "    let mut symbols = D::default();",
+      "explanation": "Construct the chosen dictionary; it models a tiny variable-name/type table."
+    },
+    {
+      "line": 39,
+      "source": "    symbols.insert(\"total\", \"int\");",
+      "explanation": "Add the symbol total with type int."
+    },
+    {
+      "line": 40,
+      "source": "    symbols.insert(\"active\", \"bool\");",
+      "explanation": "Add active after total; traversal will still place active first by key order."
+    },
+    {
+      "line": 41,
+      "source": "    symbols.insert(\"name\", \"string\");",
+      "explanation": "Add a third key to demonstrate later removal."
+    },
+    {
+      "line": 42,
+      "source": "    println!(\"Lookup total: {:?}\", symbols.get(&\"total\"));",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 43,
+      "source": "    println!(",
+      "explanation": "Start a multi-line print macro; the format string and arguments follow."
+    },
+    {
+      "line": 44,
+      "source": "        \"Update total; old type: {:?}\",",
+      "explanation": "Format-string argument for the surrounding print macro. Its placeholders are filled by the following expressions."
+    },
+    {
+      "line": 45,
+      "source": "        symbols.insert(\"total\", \"float\")",
+      "explanation": "Update an existing key and pass its old value to the surrounding print macro."
+    },
+    {
+      "line": 46,
+      "source": "    );",
+      "explanation": "Close the multi-line macro/function call and terminate the statement."
+    },
+    {
+      "line": 47,
+      "source": "    println!(\"Contains name: {}\", symbols.contains_key(&\"name\"));",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 48,
+      "source": "    println!(\"Remove name: {:?}\", symbols.remove(&\"name\"));",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 49,
+      "source": "    println!(\"Missing lookup: {:?}\", symbols.get(&\"missing\"));",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 50,
+      "source": "    println!(\"Dictionary in key order ({} entries):\", symbols.len());",
+      "explanation": "Print this labeled observation. {:?} formats Option/debug values; {} uses display formatting; println! also adds a newline."
+    },
+    {
+      "line": 51,
+      "source": "    symbols.visit(|key, value| println!(\"  {key} -> {value}\"));",
+      "explanation": "Traverse in sorted order; a closure prints each borrowed key/value pair."
+    },
+    {
+      "line": 52,
+      "source": "    stack.push(99);",
+      "explanation": "Add an item after draining to demonstrate reuse before clearing."
+    },
+    {
+      "line": 53,
+      "source": "    queue.enqueue(99);",
+      "explanation": "Add an item after draining to demonstrate reuse before clearing."
+    },
+    {
+      "line": 54,
+      "source": "    stack.clear();",
+      "explanation": "Remove any remaining stack values."
+    },
+    {
+      "line": 55,
+      "source": "    queue.clear();",
+      "explanation": "Remove any remaining queue values."
+    },
+    {
+      "line": 56,
+      "source": "    symbols.clear();",
+      "explanation": "Remove all dictionary entries."
+    },
+    {
+      "line": 57,
+      "source": "    println!(",
+      "explanation": "Start a multi-line print macro; the format string and arguments follow."
+    },
+    {
+      "line": 58,
+      "source": "        \"After clear: stack={}, queue={}, dictionary={}\",",
+      "explanation": "Format-string argument for the surrounding print macro. Its placeholders are filled by the following expressions."
+    },
+    {
+      "line": 59,
+      "source": "        stack.is_empty(),",
+      "explanation": "Supply the stack empty check to the formatted output."
+    },
+    {
+      "line": 60,
+      "source": "        queue.is_empty(),",
+      "explanation": "Supply the queue empty check to the formatted output."
+    },
+    {
+      "line": 61,
+      "source": "        symbols.is_empty()",
+      "explanation": "Supply the dictionary empty check to the formatted output."
+    },
+    {
+      "line": 62,
+      "source": "    );",
+      "explanation": "Close the multi-line macro/function call and terminate the statement."
+    },
+    {
+      "line": 63,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 65,
+      "source": "fn main() {",
+      "explanation": "Binary entry point: run the generic demonstration once for each implementation family."
+    },
+    {
+      "line": 66,
+      "source": "    demonstrate::<LibraryStack<i32>, LibraryQueue<i32>, LibraryDictionary<&str, &str>>(",
+      "explanation": "Choose concrete stack, queue, and dictionary types using explicit generic arguments; execute the shared demonstration."
+    },
+    {
+      "line": 67,
+      "source": "        \"STANDARD LIBRARY\",",
+      "explanation": "Provide the heading string for the library-backed demonstration."
+    },
+    {
+      "line": 68,
+      "source": "    );",
+      "explanation": "Close the multi-line macro/function call and terminate the statement."
+    },
+    {
+      "line": 69,
+      "source": "    demonstrate::<ManualStack<i32>, ManualQueue<i32>, ManualDictionary<&str, &str>>(\"MANUAL NODES\");",
+      "explanation": "Choose concrete stack, queue, and dictionary types using explicit generic arguments; execute the shared demonstration."
+    },
+    {
+      "line": 70,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    }
+  ],
+  "tests/behavior.rs": [
+    {
+      "line": 1,
+      "source": "//! The same behavioral checks run against both implementations.",
+      "explanation": "Module documentation: states the role or invariant of this file; it is not executed."
+    },
+    {
+      "line": 2,
+      "source": "use rust_structures_assignment::contracts::{Dictionary, Queue, Stack};",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 3,
+      "source": "use rust_structures_assignment::manual_map::ManualDictionary;",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 4,
+      "source": "use rust_structures_assignment::manual_queue::ManualQueue;",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 5,
+      "source": "use rust_structures_assignment::manual_stack::ManualStack;",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 6,
+      "source": "use rust_structures_assignment::std_impl::{LibraryDictionary, LibraryQueue, LibraryStack};",
+      "explanation": "Import public library items into this binary/test crate. Traits must also be in scope to call their methods."
+    },
+    {
+      "line": 8,
+      "source": "fn stack_empty<S: Stack<i32>>() {",
+      "explanation": "Generic test helper to validate empty-stack behavior without count underflow. Its type bound permits either implementation."
+    },
+    {
+      "line": 9,
+      "source": "    let mut s = S::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 10,
+      "source": "    assert!(s.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate empty-stack behavior without count underflow."
+    },
+    {
+      "line": 11,
+      "source": "    assert_eq!(s.len(), 0);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate empty-stack behavior without count underflow."
+    },
+    {
+      "line": 12,
+      "source": "    assert_eq!(s.peek(), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate empty-stack behavior without count underflow."
+    },
+    {
+      "line": 13,
+      "source": "    assert_eq!(s.pop(), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate empty-stack behavior without count underflow."
+    },
+    {
+      "line": 14,
+      "source": "    assert_eq!(s.len(), 0);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate empty-stack behavior without count underflow."
+    },
+    {
+      "line": 15,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 16,
+      "source": "fn stack_order<S: Stack<i32>>() {",
+      "explanation": "Generic test helper to validate LIFO order and a non-removing peek. Its type bound permits either implementation."
+    },
+    {
+      "line": 17,
+      "source": "    let mut s = S::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 18,
+      "source": "    for value in [10, 20, 30] {",
+      "explanation": "Iterate over the insertion sequence 10, 20, 30 to establish the expected order for this single test structure."
+    },
+    {
+      "line": 19,
+      "source": "        s.push(value);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 20,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 21,
+      "source": "    assert_eq!(s.peek(), Some(&30));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate LIFO order and a non-removing peek."
+    },
+    {
+      "line": 22,
+      "source": "    assert_eq!(s.len(), 3);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate LIFO order and a non-removing peek."
+    },
+    {
+      "line": 23,
+      "source": "    for value in [30, 20, 10] {",
+      "explanation": "Check removed stack items against the expected reverse insertion order."
+    },
+    {
+      "line": 24,
+      "source": "        assert_eq!(s.pop(), Some(value));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate LIFO order and a non-removing peek."
+    },
+    {
+      "line": 25,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 26,
+      "source": "    assert!(s.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate LIFO order and a non-removing peek."
+    },
+    {
+      "line": 27,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 28,
+      "source": "fn stack_clear<S: Stack<i32>>() {",
+      "explanation": "Generic test helper to validate duplicates, repeated clearing, and reuse. Its type bound permits either implementation."
+    },
+    {
+      "line": 29,
+      "source": "    let mut s = S::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 30,
+      "source": "    s.push(1);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 31,
+      "source": "    s.push(1);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 32,
+      "source": "    assert_eq!(s.len(), 2);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate duplicates, repeated clearing, and reuse."
+    },
+    {
+      "line": 33,
+      "source": "    s.clear();",
+      "explanation": "Clear the test instance. Calling this twice checks that clearing an empty structure remains safe."
+    },
+    {
+      "line": 34,
+      "source": "    s.clear();",
+      "explanation": "Clear the test instance. Calling this twice checks that clearing an empty structure remains safe."
+    },
+    {
+      "line": 35,
+      "source": "    assert_eq!(s.pop(), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate duplicates, repeated clearing, and reuse."
+    },
+    {
+      "line": 36,
+      "source": "    s.push(9);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 37,
+      "source": "    assert_eq!(s.pop(), Some(9));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate duplicates, repeated clearing, and reuse."
+    },
+    {
+      "line": 38,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 39,
+      "source": "fn stack_owned<S: Stack<String>>() {",
+      "explanation": "Generic test helper to validate an owned String without requiring Clone. Its type bound permits either implementation."
+    },
+    {
+      "line": 40,
+      "source": "    let mut s = S::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 41,
+      "source": "    s.push(String::from(\"owned\"));",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 42,
+      "source": "    assert_eq!(s.peek().map(String::as_str), Some(\"owned\"));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate an owned String without requiring Clone."
+    },
+    {
+      "line": 43,
+      "source": "    assert_eq!(s.pop(), Some(String::from(\"owned\")));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate an owned String without requiring Clone."
+    },
+    {
+      "line": 44,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 45,
+      "source": "fn queue_empty<Q: Queue<i32>>() {",
+      "explanation": "Generic test helper to validate empty-queue behavior. Its type bound permits either implementation."
+    },
+    {
+      "line": 46,
+      "source": "    let mut q = Q::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 47,
+      "source": "    assert!(q.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate empty-queue behavior."
+    },
+    {
+      "line": 48,
+      "source": "    assert_eq!(q.len(), 0);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate empty-queue behavior."
+    },
+    {
+      "line": 49,
+      "source": "    assert_eq!(q.front(), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate empty-queue behavior."
+    },
+    {
+      "line": 50,
+      "source": "    assert_eq!(q.dequeue(), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate empty-queue behavior."
+    },
+    {
+      "line": 51,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 52,
+      "source": "fn queue_order<Q: Queue<i32>>() {",
+      "explanation": "Generic test helper to validate FIFO order and a non-removing front query. Its type bound permits either implementation."
+    },
+    {
+      "line": 53,
+      "source": "    let mut q = Q::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 54,
+      "source": "    for value in [10, 20, 30] {",
+      "explanation": "Iterate over the insertion sequence 10, 20, 30 to establish the expected order for this single test structure."
+    },
+    {
+      "line": 55,
+      "source": "        q.enqueue(value);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 56,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 57,
+      "source": "    assert_eq!(q.front(), Some(&10));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate FIFO order and a non-removing front query."
+    },
+    {
+      "line": 58,
+      "source": "    assert_eq!(q.len(), 3);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate FIFO order and a non-removing front query."
+    },
+    {
+      "line": 59,
+      "source": "    for value in [10, 20, 30] {",
+      "explanation": "Iterate over the insertion sequence 10, 20, 30 to establish the expected order for this single test structure."
+    },
+    {
+      "line": 60,
+      "source": "        assert_eq!(q.dequeue(), Some(value));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate FIFO order and a non-removing front query."
+    },
+    {
+      "line": 61,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 62,
+      "source": "    assert!(q.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate FIFO order and a non-removing front query."
+    },
+    {
+      "line": 63,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 64,
+      "source": "fn queue_interleaved<Q: Queue<i32>>() {",
+      "explanation": "Generic test helper to validate FIFO ordering when enqueue and dequeue alternate. Its type bound permits either implementation."
+    },
+    {
+      "line": 65,
+      "source": "    let mut q = Q::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 66,
+      "source": "    q.enqueue(1);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 67,
+      "source": "    q.enqueue(2);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 68,
+      "source": "    assert_eq!(q.dequeue(), Some(1));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate FIFO ordering when enqueue and dequeue alternate."
+    },
+    {
+      "line": 69,
+      "source": "    q.enqueue(3);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 70,
+      "source": "    assert_eq!(q.dequeue(), Some(2));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate FIFO ordering when enqueue and dequeue alternate."
+    },
+    {
+      "line": 71,
+      "source": "    assert_eq!(q.dequeue(), Some(3));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate FIFO ordering when enqueue and dequeue alternate."
+    },
+    {
+      "line": 72,
+      "source": "    q.enqueue(4);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 73,
+      "source": "    assert_eq!(q.dequeue(), Some(4));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate FIFO ordering when enqueue and dequeue alternate."
+    },
+    {
+      "line": 74,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 75,
+      "source": "fn queue_clear<Q: Queue<i32>>() {",
+      "explanation": "Generic test helper to validate duplicates, repeated clearing, and reuse. Its type bound permits either implementation."
+    },
+    {
+      "line": 76,
+      "source": "    let mut q = Q::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 77,
+      "source": "    q.enqueue(1);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 78,
+      "source": "    q.enqueue(1);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 79,
+      "source": "    assert_eq!(q.len(), 2);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate duplicates, repeated clearing, and reuse."
+    },
+    {
+      "line": 80,
+      "source": "    q.clear();",
+      "explanation": "Clear the test instance. Calling this twice checks that clearing an empty structure remains safe."
+    },
+    {
+      "line": 81,
+      "source": "    q.clear();",
+      "explanation": "Clear the test instance. Calling this twice checks that clearing an empty structure remains safe."
+    },
+    {
+      "line": 82,
+      "source": "    assert!(q.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate duplicates, repeated clearing, and reuse."
+    },
+    {
+      "line": 83,
+      "source": "    q.enqueue(9);",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 84,
+      "source": "    assert_eq!(q.dequeue(), Some(9));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate duplicates, repeated clearing, and reuse."
+    },
+    {
+      "line": 85,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 86,
+      "source": "fn queue_owned<Q: Queue<String>>() {",
+      "explanation": "Generic test helper to validate an owned String without requiring Clone. Its type bound permits either implementation."
+    },
+    {
+      "line": 87,
+      "source": "    let mut q = Q::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 88,
+      "source": "    q.enqueue(String::from(\"owned\"));",
+      "explanation": "Insert the specified owned value into the selected implementation; duplicates are intentional in reuse scenarios."
+    },
+    {
+      "line": 89,
+      "source": "    assert_eq!(q.front().map(String::as_str), Some(\"owned\"));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate an owned String without requiring Clone."
+    },
+    {
+      "line": 90,
+      "source": "    assert_eq!(q.dequeue(), Some(String::from(\"owned\")));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate an owned String without requiring Clone."
+    },
+    {
+      "line": 91,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 92,
+      "source": "fn dictionary_empty<D: Dictionary<i32, i32>>() {",
+      "explanation": "Generic test helper to validate missing keys and empty traversal. Its type bound permits either implementation."
+    },
+    {
+      "line": 93,
+      "source": "    let mut d = D::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 94,
+      "source": "    assert!(d.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate missing keys and empty traversal."
+    },
+    {
+      "line": 95,
+      "source": "    assert_eq!(d.get(&1), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate missing keys and empty traversal."
+    },
+    {
+      "line": 96,
+      "source": "    assert!(!d.contains_key(&1));",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate missing keys and empty traversal."
+    },
+    {
+      "line": 97,
+      "source": "    assert_eq!(d.remove(&1), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate missing keys and empty traversal."
+    },
+    {
+      "line": 98,
+      "source": "    let mut calls = 0;",
+      "explanation": "Initialize the count of visitor invocations; an empty dictionary must keep it at zero."
+    },
+    {
+      "line": 99,
+      "source": "    d.visit(|_, _| calls += 1);",
+      "explanation": "Invoke ordered traversal with a closure that records keys/pairs or increments the test-only visitor counter."
+    },
+    {
+      "line": 100,
+      "source": "    assert_eq!(calls, 0);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate missing keys and empty traversal."
+    },
+    {
+      "line": 101,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 102,
+      "source": "fn dictionary_update<D: Dictionary<i32, i32>>() {",
+      "explanation": "Generic test helper to validate replacement, count preservation, and repeated removal. Its type bound permits either implementation."
+    },
+    {
+      "line": 103,
+      "source": "    let mut d = D::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 104,
+      "source": "    assert_eq!(d.insert(2, 20), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 105,
+      "source": "    assert_eq!(d.insert(2, 99), Some(20));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 106,
+      "source": "    assert_eq!(d.len(), 1);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 107,
+      "source": "    assert_eq!(d.get(&2), Some(&99));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 108,
+      "source": "    assert!(d.contains_key(&2));",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 109,
+      "source": "    assert_eq!(d.remove(&2), Some(99));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 110,
+      "source": "    assert_eq!(d.remove(&2), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 111,
+      "source": "    assert!(d.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: validate replacement, count preservation, and repeated removal."
+    },
+    {
+      "line": 112,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 113,
+      "source": "fn dictionary_order<D: Dictionary<i32, i32>>() {",
+      "explanation": "Generic test helper to validate complete ascending-key traversal. Its type bound permits either implementation."
+    },
+    {
+      "line": 114,
+      "source": "    let mut d = D::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 115,
+      "source": "    for key in [4, 2, 6, 1, 3, 5, 7] {",
+      "explanation": "Insert keys in this explicit order to create the intended tree shape; later assertions inspect order or deletion behavior."
+    },
+    {
+      "line": 116,
+      "source": "        d.insert(key, key * 10);",
+      "explanation": "Insert the specified test key/value; type inference follows the generic scenario or tracked-value fixture."
+    },
+    {
+      "line": 117,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 118,
+      "source": "    let mut entries = Vec::new();",
+      "explanation": "Create a test-only vector that collects observed traversal output; the manual storage itself does not use it."
+    },
+    {
+      "line": 119,
+      "source": "    d.visit(|key, value| entries.push((*key, *value)));",
+      "explanation": "Invoke ordered traversal with a closure that records keys/pairs or increments the test-only visitor counter."
+    },
+    {
+      "line": 120,
+      "source": "    assert_eq!(entries, (1..=7).map(|k| (k, k * 10)).collect::<Vec<_>>());",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate complete ascending-key traversal."
+    },
+    {
+      "line": 121,
+      "source": "    assert_eq!(d.len(), 7);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate complete ascending-key traversal."
+    },
+    {
+      "line": 122,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 123,
+      "source": "fn dictionary_removal<D: Dictionary<i32, i32>>() {",
+      "explanation": "Generic test helper to exercise all child-count deletion cases and remaining counts. Its type bound permits either implementation."
+    },
+    {
+      "line": 124,
+      "source": "    let mut d = D::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 125,
+      "source": "    for key in [4, 2, 6, 1, 3, 5, 7] {",
+      "explanation": "Insert keys in this explicit order to create the intended tree shape; later assertions inspect order or deletion behavior."
+    },
+    {
+      "line": 126,
+      "source": "        d.insert(key, key * 10);",
+      "explanation": "Insert the specified test key/value; type inference follows the generic scenario or tracked-value fixture."
+    },
+    {
+      "line": 127,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 128,
+      "source": "    // Leaf, one-child, and two-child deletions, including the root.",
+      "explanation": "Implementation comment: explains the intention of the following code; comments do not run."
+    },
+    {
+      "line": 129,
+      "source": "    for (index, key) in [1, 2, 4, 6, 3, 5, 7].into_iter().enumerate() {",
+      "explanation": "Iterate through the deletion sequence with a zero-based index to compute the expected remaining count."
+    },
+    {
+      "line": 130,
+      "source": "        assert_eq!(d.remove(&key), Some(key * 10));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: exercise all child-count deletion cases and remaining counts."
+    },
+    {
+      "line": 131,
+      "source": "        assert_eq!(d.get(&key), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: exercise all child-count deletion cases and remaining counts."
+    },
+    {
+      "line": 132,
+      "source": "        assert_eq!(d.len(), 6 - index);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: exercise all child-count deletion cases and remaining counts."
+    },
+    {
+      "line": 133,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 134,
+      "source": "    assert!(d.is_empty());",
+      "explanation": "Require this boolean condition to be true; ! negates membership when present. Context: exercise all child-count deletion cases and remaining counts."
+    },
+    {
+      "line": 135,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 136,
+      "source": "fn dictionary_successor<D: Dictionary<i32, i32>>() {",
+      "explanation": "Generic test helper to preserve the successor's right child during two-child deletion. Its type bound permits either implementation."
+    },
+    {
+      "line": 137,
+      "source": "    let mut d = D::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 138,
+      "source": "    for key in [8, 4, 12, 10, 11, 14] {",
+      "explanation": "Insert keys in this explicit order to create the intended tree shape; later assertions inspect order or deletion behavior."
+    },
+    {
+      "line": 139,
+      "source": "        d.insert(key, key);",
+      "explanation": "Insert the specified test key/value; type inference follows the generic scenario or tracked-value fixture."
+    },
+    {
+      "line": 140,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 141,
+      "source": "    assert_eq!(d.remove(&8), Some(8));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: preserve the successor's right child during two-child deletion."
+    },
+    {
+      "line": 142,
+      "source": "    let mut keys = Vec::new();",
+      "explanation": "Create a test-only vector that collects observed traversal output; the manual storage itself does not use it."
+    },
+    {
+      "line": 143,
+      "source": "    d.visit(|key, _| keys.push(*key));",
+      "explanation": "Invoke ordered traversal with a closure that records keys/pairs or increments the test-only visitor counter."
+    },
+    {
+      "line": 144,
+      "source": "    assert_eq!(keys, [4, 10, 11, 12, 14]);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: preserve the successor's right child during two-child deletion."
+    },
+    {
+      "line": 145,
+      "source": "    assert_eq!(d.len(), 5);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: preserve the successor's right child during two-child deletion."
+    },
+    {
+      "line": 146,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 147,
+      "source": "fn dictionary_clear<D: Dictionary<i32, i32>>() {",
+      "explanation": "Generic test helper to validate cleanup and reuse after ascending-key insertion. Its type bound permits either implementation."
+    },
+    {
+      "line": 148,
+      "source": "    let mut d = D::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 149,
+      "source": "    for key in 0..128 {",
+      "explanation": "Insert 128 ascending keys (0 through 127), creating a skewed manual tree for the cleanup/reuse test."
+    },
+    {
+      "line": 150,
+      "source": "        d.insert(key, key);",
+      "explanation": "Insert the specified test key/value; type inference follows the generic scenario or tracked-value fixture."
+    },
+    {
+      "line": 151,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 152,
+      "source": "    d.clear();",
+      "explanation": "Clear all dictionary entries; the test later confirms count, absence of old keys, and reuse."
+    },
+    {
+      "line": 153,
+      "source": "    d.clear();",
+      "explanation": "Clear all dictionary entries; the test later confirms count, absence of old keys, and reuse."
+    },
+    {
+      "line": 154,
+      "source": "    assert_eq!(d.len(), 0);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate cleanup and reuse after ascending-key insertion."
+    },
+    {
+      "line": 155,
+      "source": "    assert_eq!(d.get(&127), None);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate cleanup and reuse after ascending-key insertion."
+    },
+    {
+      "line": 156,
+      "source": "    d.insert(9, 90);",
+      "explanation": "Insert the specified test key/value; type inference follows the generic scenario or tracked-value fixture."
+    },
+    {
+      "line": 157,
+      "source": "    assert_eq!(d.remove(&9), Some(90));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate cleanup and reuse after ascending-key insertion."
+    },
+    {
+      "line": 158,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 159,
+      "source": "fn dictionary_owned<D: Dictionary<String, String>>() {",
+      "explanation": "Generic test helper to validate owned string keys and values without cloning. Its type bound permits either implementation."
+    },
+    {
+      "line": 160,
+      "source": "    let mut d = D::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 161,
+      "source": "    d.insert(String::from(\"name\"), String::from(\"string\"));",
+      "explanation": "Insert the specified test key/value; type inference follows the generic scenario or tracked-value fixture."
+    },
+    {
+      "line": 162,
+      "source": "    assert_eq!(",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate owned string keys and values without cloning."
+    },
+    {
+      "line": 163,
+      "source": "        d.get(&String::from(\"name\")).map(String::as_str),",
+      "explanation": "Borrow the owned string-key entry and map its String value to &str for content comparison in the assertion."
+    },
+    {
+      "line": 164,
+      "source": "        Some(\"string\")",
+      "explanation": "Expected borrowed string slice inside Some for the owned-dictionary lookup assertion."
+    },
+    {
+      "line": 165,
+      "source": "    );",
+      "explanation": "Close the multi-line macro/function call and terminate the statement."
+    },
+    {
+      "line": 166,
+      "source": "    assert_eq!(",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: validate owned string keys and values without cloning."
+    },
+    {
+      "line": 167,
+      "source": "        d.remove(&String::from(\"name\")),",
+      "explanation": "Remove by a temporary borrowed owned-string key and pass the result to the surrounding assertion."
+    },
+    {
+      "line": 168,
+      "source": "        Some(String::from(\"string\"))",
+      "explanation": "Construct the expected owned String result inside Some for the surrounding equality assertion."
+    },
+    {
+      "line": 169,
+      "source": "    );",
+      "explanation": "Close the multi-line macro/function call and terminate the statement."
+    },
+    {
+      "line": 170,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 172,
+      "source": "// Generate named test wrappers while sharing each scenario's actual assertions.",
+      "explanation": "Implementation comment: explains the intention of the following code; comments do not run."
+    },
+    {
+      "line": 173,
+      "source": "macro_rules! suite {",
+      "explanation": "Define the suite syntax macro; its expansion will generate 16 separately named test functions per implementation."
+    },
+    {
+      "line": 174,
+      "source": "    ($s:ident, $q:ident, $d:ident) => {",
+      "explanation": "Macro pattern: accept three type identifiers and expand the body with those names substituted."
+    },
+    {
+      "line": 175,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 176,
+      "source": "        fn empty_stack() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 177,
+      "source": "            stack_empty::<$s<i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 178,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 179,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 180,
+      "source": "        fn lifo_stack() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 181,
+      "source": "            stack_order::<$s<i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 182,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 183,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 184,
+      "source": "        fn reusable_stack() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 185,
+      "source": "            stack_clear::<$s<i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 186,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 187,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 188,
+      "source": "        fn owned_stack() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 189,
+      "source": "            stack_owned::<$s<String>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 190,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 191,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 192,
+      "source": "        fn empty_queue() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 193,
+      "source": "            queue_empty::<$q<i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 194,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 195,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 196,
+      "source": "        fn fifo_queue() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 197,
+      "source": "            queue_order::<$q<i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 198,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 199,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 200,
+      "source": "        fn mixed_queue() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 201,
+      "source": "            queue_interleaved::<$q<i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 202,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 203,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 204,
+      "source": "        fn reusable_queue() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 205,
+      "source": "            queue_clear::<$q<i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 206,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 207,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 208,
+      "source": "        fn owned_queue() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 209,
+      "source": "            queue_owned::<$q<String>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 210,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 211,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 212,
+      "source": "        fn empty_dictionary() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 213,
+      "source": "            dictionary_empty::<$d<i32, i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 214,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 215,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 216,
+      "source": "        fn updated_dictionary() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 217,
+      "source": "            dictionary_update::<$d<i32, i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 218,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 219,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 220,
+      "source": "        fn sorted_dictionary() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 221,
+      "source": "            dictionary_order::<$d<i32, i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 222,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 223,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 224,
+      "source": "        fn deleted_dictionary() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 225,
+      "source": "            dictionary_removal::<$d<i32, i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 226,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 227,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 228,
+      "source": "        fn successor_dictionary() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 229,
+      "source": "            dictionary_successor::<$d<i32, i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 230,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 231,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 232,
+      "source": "        fn reusable_dictionary() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 233,
+      "source": "            dictionary_clear::<$d<i32, i32>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 234,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 235,
+      "source": "        #[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 236,
+      "source": "        fn owned_dictionary() {",
+      "explanation": "Named test wrapper generated by the suite macro; its body selects one concrete type and invokes a shared scenario."
+    },
+    {
+      "line": 237,
+      "source": "            dictionary_owned::<$d<String, String>>();",
+      "explanation": "Invoke this shared scenario with the concrete type substituted by the suite macro; <...> chooses stored value types."
+    },
+    {
+      "line": 238,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 239,
+      "source": "    };",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 240,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 241,
+      "source": "mod library {",
+      "explanation": "Start a test namespace so identical generated test names can coexist for each implementation."
+    },
+    {
+      "line": 242,
+      "source": "    use super::*;",
+      "explanation": "Import the parent test module's helper functions, traits, and implementation types."
+    },
+    {
+      "line": 243,
+      "source": "    suite!(LibraryStack, LibraryQueue, LibraryDictionary);",
+      "explanation": "Expand 16 named tests that use the standard-collection implementations."
+    },
+    {
+      "line": 244,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 245,
+      "source": "mod manual {",
+      "explanation": "Start a test namespace so identical generated test names can coexist for each implementation."
+    },
+    {
+      "line": 246,
+      "source": "    use super::*;",
+      "explanation": "Import the parent test module's helper functions, traits, and implementation types."
+    },
+    {
+      "line": 247,
+      "source": "    suite!(ManualStack, ManualQueue, ManualDictionary);",
+      "explanation": "Expand the identical 16 named tests using the manual implementations."
+    },
+    {
+      "line": 248,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 250,
+      "source": "#[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 251,
+      "source": "fn deterministic_differential_operations() {",
+      "explanation": "Generic test helper to compare both versions after each reproducible mixed operation. Its type bound permits either implementation."
+    },
+    {
+      "line": 252,
+      "source": "    let mut a = LibraryDictionary::<i32, i32>::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 253,
+      "source": "    let mut b = ManualDictionary::<i32, i32>::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 254,
+      "source": "    let mut s1 = LibraryStack::<i32>::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 255,
+      "source": "    let mut s2 = ManualStack::<i32>::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 256,
+      "source": "    let mut q1 = LibraryQueue::<i32>::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 257,
+      "source": "    let mut q2 = ManualQueue::<i32>::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 258,
+      "source": "    let mut seed = 42_u32;",
+      "explanation": "Set a reproducible 32-bit unsigned seed; reruns use the same sequence."
+    },
+    {
+      "line": 259,
+      "source": "    for step in 0..1000 {",
+      "explanation": "Perform 1,000 steps, numbered 0 through 999. The upper bound is excluded."
+    },
+    {
+      "line": 260,
+      "source": "        seed = seed.wrapping_mul(1664525).wrapping_add(1013904223);",
+      "explanation": "Update a deterministic pseudo-random sequence; wrapping arithmetic avoids overflow panics."
+    },
+    {
+      "line": 261,
+      "source": "        let key = ((seed >> 8) % 31) as i32;",
+      "explanation": "Shift bits, restrict the key to 0..30, then convert safely to a signed integer."
+    },
+    {
+      "line": 262,
+      "source": "        match seed % 5 {",
+      "explanation": "Choose one of five operation codes from the deterministic sequence."
+    },
+    {
+      "line": 263,
+      "source": "            0 | 1 => {",
+      "explanation": "Either pattern 0 or 1 selects insertion/addition. The vertical bar means an alternative pattern."
+    },
+    {
+      "line": 264,
+      "source": "                assert_eq!(a.insert(key, step), b.insert(key, step));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 265,
+      "source": "                s1.push(key);",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 266,
+      "source": "                s2.push(key);",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 267,
+      "source": "                q1.enqueue(key);",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 268,
+      "source": "                q2.enqueue(key);",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 269,
+      "source": "            }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 270,
+      "source": "            2 => {",
+      "explanation": "Operation code 2 selects deletion/removal from all three structures."
+    },
+    {
+      "line": 271,
+      "source": "                assert_eq!(a.remove(&key), b.remove(&key));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 272,
+      "source": "                assert_eq!(s1.pop(), s2.pop());",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 273,
+      "source": "                assert_eq!(q1.dequeue(), q2.dequeue());",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 274,
+      "source": "            }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 275,
+      "source": "            3 => assert_eq!(a.get(&key), b.get(&key)),",
+      "explanation": "Operation code 3 compares lookups without mutation."
+    },
+    {
+      "line": 276,
+      "source": "            _ => {",
+      "explanation": "Catch all remaining operation codes; here that is 4, which clears all structures."
+    },
+    {
+      "line": 277,
+      "source": "                a.clear();",
+      "explanation": "Clear this dictionary during the differential scenario; the matching instance receives the same operation."
+    },
+    {
+      "line": 278,
+      "source": "                b.clear();",
+      "explanation": "Clear this dictionary during the differential scenario; the matching instance receives the same operation."
+    },
+    {
+      "line": 279,
+      "source": "                s1.clear();",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 280,
+      "source": "                s2.clear();",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 281,
+      "source": "                q1.clear();",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 282,
+      "source": "                q2.clear();",
+      "explanation": "Apply the same mixed operation to this stack/queue implementation so its state can be compared with the other one."
+    },
+    {
+      "line": 283,
+      "source": "            }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 284,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 285,
+      "source": "        assert_eq!(s1.peek(), s2.peek());",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 286,
+      "source": "        assert_eq!(q1.front(), q2.front());",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 287,
+      "source": "        assert_eq!((a.len(), s1.len(), q1.len()), (b.len(), s2.len(), q2.len()));",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 288,
+      "source": "        let mut x = Vec::new();",
+      "explanation": "Allocate test-only output storage for the library dictionary traversal."
+    },
+    {
+      "line": 289,
+      "source": "        let mut y = Vec::new();",
+      "explanation": "Allocate test-only output storage for the manual dictionary traversal."
+    },
+    {
+      "line": 290,
+      "source": "        a.visit(|k, v| x.push((*k, *v)));",
+      "explanation": "Copy borrowed integer pairs into the library observation vector."
+    },
+    {
+      "line": 291,
+      "source": "        b.visit(|k, v| y.push((*k, *v)));",
+      "explanation": "Copy borrowed integer pairs into the manual observation vector."
+    },
+    {
+      "line": 292,
+      "source": "        assert_eq!(x, y);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: compare both versions after each reproducible mixed operation."
+    },
+    {
+      "line": 293,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 294,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 296,
+      "source": "#[test]",
+      "explanation": "Mark the following zero-argument function as a test for cargo test to discover."
+    },
+    {
+      "line": 297,
+      "source": "fn manual_values_drop_exactly_once() {",
+      "explanation": "Generic test helper to check that every tracked owned value is destroyed exactly once. Its type bound permits either implementation."
+    },
+    {
+      "line": 298,
+      "source": "    use std::cell::Cell;",
+      "explanation": "Import interior-mutability storage for the test's destruction counter."
+    },
+    {
+      "line": 299,
+      "source": "    use std::rc::Rc;",
+      "explanation": "Import a single-thread reference-counted pointer so tracked test values share the same counter."
+    },
+    {
+      "line": 300,
+      "source": "    struct Tracked(Rc<Cell<usize>>);",
+      "explanation": "Define a tuple struct with one counter field; it deliberately does not implement Clone or Copy."
+    },
+    {
+      "line": 301,
+      "source": "    impl Drop for Tracked {",
+      "explanation": "Implement automatic cleanup when this owner leaves scope or is explicitly dropped."
+    },
+    {
+      "line": 302,
+      "source": "        fn drop(&mut self) {",
+      "explanation": "Automatic Drop hook, borrowing the soon-to-be-destroyed instance mutably."
+    },
+    {
+      "line": 303,
+      "source": "            self.0.set(self.0.get() + 1);",
+      "explanation": "Read and increment the shared destruction counter; .0 accesses the tuple struct's first field."
+    },
+    {
+      "line": 304,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 305,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 306,
+      "source": "    let count = Rc::new(Cell::new(0));",
+      "explanation": "Create one shared counter initially set to zero."
+    },
+    {
+      "line": 307,
+      "source": "    {",
+      "explanation": "Open a block; local owners created here are dropped when its scope ends."
+    },
+    {
+      "line": 308,
+      "source": "        let mut s = ManualStack::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 309,
+      "source": "        let mut q = ManualQueue::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 310,
+      "source": "        let mut d = ManualDictionary::default();",
+      "explanation": "Construct an empty mutable test instance; type annotations or the generic helper determine its stored types."
+    },
+    {
+      "line": 311,
+      "source": "        for key in 0..20 {",
+      "explanation": "Create 20 values in each manual structure; keys run from 0 through 19."
+    },
+    {
+      "line": 312,
+      "source": "            s.push(Tracked(Rc::clone(&count)));",
+      "explanation": "Create a new tracked stack value sharing the counter; Rc cloning shares the pointer, not a stored value."
+    },
+    {
+      "line": 313,
+      "source": "            q.enqueue(Tracked(Rc::clone(&count)));",
+      "explanation": "Create a new tracked queue value sharing the same counter."
+    },
+    {
+      "line": 314,
+      "source": "            d.insert(key, Tracked(Rc::clone(&count)));",
+      "explanation": "Create a new tracked dictionary value for this key."
+    },
+    {
+      "line": 315,
+      "source": "        }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 316,
+      "source": "        drop(s.pop());",
+      "explanation": "Explicitly drop the removed stack value, immediately incrementing its counter."
+    },
+    {
+      "line": 317,
+      "source": "        drop(q.dequeue());",
+      "explanation": "Explicitly drop the removed queue value."
+    },
+    {
+      "line": 318,
+      "source": "        drop(d.remove(&10));",
+      "explanation": "Remove dictionary key 10 and immediately drop the returned value."
+    },
+    {
+      "line": 319,
+      "source": "        drop(d.insert(11, Tracked(Rc::clone(&count))));",
+      "explanation": "Create the 61st tracked value, replace key 11, and drop its old value immediately."
+    },
+    {
+      "line": 320,
+      "source": "        assert_eq!(count.get(), 4);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: the selected shared scenario."
+    },
+    {
+      "line": 321,
+      "source": "    }",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    },
+    {
+      "line": 322,
+      "source": "    assert_eq!(count.get(), 61);",
+      "explanation": "Require actual and expected values to be equal; failure panics and marks this test failed. Context: the selected shared scenario."
+    },
+    {
+      "line": 323,
+      "source": "}",
+      "explanation": "Close the surrounding block or match arm. A comma separates arms; a semicolon terminates a declaration when present."
+    }
+  ]
+}

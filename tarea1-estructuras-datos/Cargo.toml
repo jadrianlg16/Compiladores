@@ -1,0 +1,8 @@
+[package]
+name = "rust_structures_assignment"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.70"
+description = "Library-backed and manually implemented stack, queue, and ordered dictionary"
+
+[dependencies]

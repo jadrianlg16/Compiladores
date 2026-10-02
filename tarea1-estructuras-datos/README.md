@@ -1,0 +1,121 @@
+# Assignment 1: Data Structures in Rust
+
+This project demonstrates a stack (LIFO), a queue (FIFO), and an ordered dictionary in two ways: adapters around Rust's standard collections, and manually implemented linked structures. All code, comments, tests, and documentation are in English.
+
+## Run it
+
+Install a Rust toolchain with Cargo using https://rustup.rs/ if needed. Open a terminal in this project directory:
+
+```sh
+cargo run
+cargo test
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+```
+
+The project has no external dependencies. `src/lib.rs` contains the reusable library; `src/main.rs` is the console demonstration; `tests/behavior.rs` validates both implementations.
+
+## What the assignment asks for
+
+The supplied assignment permits public libraries or implementation from scratch. It requests source files, a small demonstration program, descriptions of test cases, storage in Git, and the exact AI tools and prompts used. See `TEST_CASES.md` and `AI_USAGE.md`.
+
+The text `TABLE/HASH/DICTIONARY (order)` does not define whether order means insertion order or key order. This project explicitly chooses **sorted key order** and treats TABLE/HASH/DICTIONARY as alternatives for a key-value dictionary. It does not implement hashing. Confirm this interpretation if your instructor intended a hash table specifically.
+
+## Two implementations, one public contract
+
+| Concept | Standard-collection adapter | Manual implementation |
+|---|---|---|
+| Stack | `LibraryStack<T>` wraps `Vec<T>` | `ManualStack<T>` links heap-allocated nodes |
+| Queue | `LibraryQueue<T>` wraps `VecDeque<T>` | `ManualQueue<T>` links heap-allocated nodes |
+| Ordered dictionary | `LibraryDictionary<K, V>` wraps `BTreeMap<K, V>` | `ManualDictionary<K, V>` is an unbalanced binary search tree |
+
+`contracts.rs` defines three traits. A trait describes required behavior, much like an interface. A `struct` defines stored data, and an `impl` block provides methods. Rust does not use traditional class declarations or class inheritance here.
+
+The same generic demonstration and test scenarios call these traits. If a manual implementation violates the agreed behavior, the same assertions that validate the library version should fail for the manual version.
+
+### Stack operations
+
+`push(value)` takes ownership of a value. `pop()` removes and returns the most recent value as `Some(value)`, or returns `None` when empty. `peek()` borrows the most recent value without removing it. `len()`, `is_empty()`, and `clear()` inspect or reset the stack. Duplicate values are allowed.
+
+### Queue operations
+
+`enqueue(value)` takes ownership of a value at the back. `dequeue()` removes and returns the earliest remaining value. `front()` borrows that value without removing it. `len()`, `is_empty()`, and `clear()` behave as for the stack. Duplicate values are allowed.
+
+### Dictionary operations
+
+`insert(key, value)` adds a new key and returns `None`, or replaces an existing key's value and returns `Some(old_value)` without changing the count. `get(&key)` borrows a stored value. `remove(&key)` transfers a removed value to the caller. `contains_key(&key)` checks membership. `visit(visitor)` calls a closure for each key/value pair in ascending key order. `len()`, `is_empty()`, and `clear()` inspect or reset the dictionary.
+
+Keys require `Ord`, so any two keys can be compared. Values do not need `Clone` or `Copy`. Traversal uses a callback instead of returning a `Vec`, keeping the manual collection modules free of built-in collection storage.
+
+## What "from scratch" means here
+
+The files `manual_stack.rs`, `manual_queue.rs`, and `manual_map.rs` use no `Vec`, `VecDeque`, `HashMap`, `BTreeMap`, external collection crate, raw pointer, or `unsafe` block. They implement all links and operations themselves.
+
+They still use basic Rust facilities: `Option`, `Box`, `Ordering`, and `std::mem::replace`. `Box` supplies heap allocation and ownership; it does not implement a stack, queue, or dictionary for us. Avoiding these facilities entirely would turn this exercise into an allocator and unsafe-memory exercise.
+
+The tests use `Vec` to collect observed output for comparison. That use is outside the manual storage implementation. Tests also use `Rc<Cell<usize>>` to count destruction of tracked values; those types do not implement any of the submitted structures.
+
+## Performance and design limits
+
+Here `n` is the number of entries and `h` is the manual tree's height.
+
+| Operation | Standard version | Manual version |
+|---|---|---|
+| Stack push | O(1) amortized | O(1) |
+| Stack pop / peek | O(1) | O(1) |
+| Queue enqueue | O(1) amortized | O(n): walks to the tail |
+| Queue dequeue / front | O(1) | O(1) |
+| Dictionary insert / get / remove | O(log n) | O(h), worst-case O(n) |
+| Dictionary full traversal | O(n) | O(n), with O(h) recursive call depth |
+| Size / empty checks | O(1) | O(1) |
+| Clear | O(n) | O(n) |
+
+The manual queue favors simple, safe ownership over a tail-pointer optimization. The manual tree is not balanced: inserting sorted keys can create a chain. Recursive tree traversal and deletion can exhaust the call stack for sufficiently deep trees. These are educational implementations, not replacements for production collections. Stack/queue cleanup and dictionary cleanup are iterative to avoid recursively dropping a chain of owned nodes. Dictionary cleanup uses rotations to preserve all remaining nodes until they are detached and dropped.
+
+Identical behavior does not imply identical algorithms or running time. The tests check correctness, not benchmark claims.
+
+## Expected demonstration
+
+Both headings should show the same operations and results:
+
+- Pushing/enqueuing `10, 20, 30` yields stack removal `30 20 10` and queue removal `10 20 30`.
+- Empty removal returns `None`.
+- `total` changes from `int` to `float`, with `Some("int")` returned on replacement.
+- Removing `name` returns its previous value.
+- The remaining dictionary entries print `active` before `total`.
+- All three empty checks print `true` after clearing.
+
+## Folder layout
+
+```text
+tarea1-estructuras-datos/
+├── Cargo.toml, Cargo.lock
+├── README.md          this overview
+├── TEST_CASES.md      test-case descriptions (deliverable)
+├── AI_USAGE.md        AI tools and exact prompts used (deliverable)
+├── src/               library (contracts, std adapters, manual structures) + demo in main.rs
+├── tests/behavior.rs  behavioral test suite
+└── docs/
+    ├── Rust_Data_Structures_Explained.pdf  line-by-line learning guide
+    ├── LINE_BY_LINE.json                    data behind the guide
+    ├── SOURCE_MANIFEST.json                 SHA-256 of the sources the guide describes
+    ├── VERIFICATION.md                      verification report
+    ├── DEMO_OUTPUT.txt                      captured `cargo run` output
+    └── TEST_OUTPUT.txt                      captured `cargo test` output
+```
+
+This folder lives inside the course repository, next to the other assignments and the mini-project.
+
+The PDF in `docs/` follows the final formatted source line numbers; `docs/SOURCE_MANIFEST.json` records which source versions it describes. Changing the code later can change those numbers. Read its overview and Rust syntax primer first, then follow the source walkthrough in the recommended order.
+
+## References
+
+- Standard collections: https://doc.rust-lang.org/std/collections/index.html
+- Vec: https://doc.rust-lang.org/std/vec/struct.Vec.html
+- VecDeque: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
+- BTreeMap: https://doc.rust-lang.org/std/collections/struct.BTreeMap.html
+- Ownership: https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html
+- Borrowing: https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html
+- Box: https://doc.rust-lang.org/book/ch15-01-box.html
+- Option: https://doc.rust-lang.org/std/option/enum.Option.html
+- Testing: https://doc.rust-lang.org/book/ch11-01-writing-tests.html
