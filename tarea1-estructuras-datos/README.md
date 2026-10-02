@@ -1,6 +1,6 @@
 # Assignment 1: Data Structures in Rust
 
-This project demonstrates a stack (LIFO), a queue (FIFO), and an ordered dictionary in two ways: adapters around Rust's standard collections, and manually implemented linked structures. All code, comments, tests, and documentation are in English.
+This project demonstrates a stack (LIFO), a queue (FIFO), and a dictionary in two ways: adapters around Rust's standard collections, and manually implemented linked structures. The dictionary has a third version backed by a hash table (`HashMap`). All code, comments, tests, and documentation are in English.
 
 ## Run it
 
@@ -13,21 +13,22 @@ cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 ```
 
-The project has no external dependencies. `src/lib.rs` contains the reusable library; `src/main.rs` is the console demonstration; `tests/behavior.rs` validates both implementations.
+The project has no external dependencies. `src/lib.rs` contains the reusable library; `src/main.rs` is the console demonstration; `tests/behavior.rs` validates every implementation.
 
 ## What the assignment asks for
 
 The supplied assignment permits public libraries or implementation from scratch. It requests source files, a small demonstration program, descriptions of test cases, storage in Git, and the exact AI tools and prompts used. See `TEST_CASES.md` and `AI_USAGE.md`.
 
-The text `TABLE/HASH/DICTIONARY (order)` does not define whether order means insertion order or key order. This project explicitly chooses **sorted key order** and treats TABLE/HASH/DICTIONARY as alternatives for a key-value dictionary. It does not implement hashing. Confirm this interpretation if your instructor intended a hash table specifically.
+`TABLE/HASH/DICTIONARY (order)` is implemented as a key-value dictionary with unique keys whose traversal follows **sorted key order**. It is provided three ways: a balanced search tree (`BTreeMap`), a hash table (`HashMap`), and a manual binary search tree. All three satisfy the same contract and pass the same tests.
 
-## Two implementations, one public contract
+## Implementations and their shared contract
 
 | Concept | Standard-collection adapter | Manual implementation |
 |---|---|---|
 | Stack | `LibraryStack<T>` wraps `Vec<T>` | `ManualStack<T>` links heap-allocated nodes |
 | Queue | `LibraryQueue<T>` wraps `VecDeque<T>` | `ManualQueue<T>` links heap-allocated nodes |
-| Ordered dictionary | `LibraryDictionary<K, V>` wraps `BTreeMap<K, V>` | `ManualDictionary<K, V>` is an unbalanced binary search tree |
+| Dictionary (tree) | `LibraryDictionary<K, V>` wraps `BTreeMap<K, V>` | `ManualDictionary<K, V>` is an unbalanced binary search tree |
+| Dictionary (hash table) | `LibraryHashDictionary<K, V>` wraps `HashMap<K, V>` | — |
 
 `contracts.rs` defines three traits. A trait describes required behavior, much like an interface. A `struct` defines stored data, and an `impl` block provides methods. Rust does not use traditional class declarations or class inheritance here.
 
@@ -45,7 +46,9 @@ The same generic demonstration and test scenarios call these traits. If a manual
 
 `insert(key, value)` adds a new key and returns `None`, or replaces an existing key's value and returns `Some(old_value)` without changing the count. `get(&key)` borrows a stored value. `remove(&key)` transfers a removed value to the caller. `contains_key(&key)` checks membership. `visit(visitor)` calls a closure for each key/value pair in ascending key order. `len()`, `is_empty()`, and `clear()` inspect or reset the dictionary.
 
-Keys require `Ord`, so any two keys can be compared. Values do not need `Clone` or `Copy`. Traversal uses a callback instead of returning a `Vec`, keeping the manual collection modules free of built-in collection storage.
+Keys require `Ord`, so any two keys can be compared; the hash-table version also requires `Hash`. Values do not need `Clone` or `Copy`.
+
+`HashMap` stores entries in no fixed order. To keep the shared contract, `LibraryHashDictionary::visit` collects references to the entries and sorts them by key before calling the visitor. Insert, lookup, and removal keep the hash table's average O(1) cost; only full traversal pays for the sort. This is the structure a compiler typically uses for a symbol table, where lookups by name dominate. Traversal uses a callback instead of returning a `Vec`, keeping the manual collection modules free of built-in collection storage.
 
 ## What "from scratch" means here
 
@@ -59,16 +62,16 @@ The tests use `Vec` to collect observed output for comparison. That use is outsi
 
 Here `n` is the number of entries and `h` is the manual tree's height.
 
-| Operation | Standard version | Manual version |
-|---|---|---|
-| Stack push | O(1) amortized | O(1) |
-| Stack pop / peek | O(1) | O(1) |
-| Queue enqueue | O(1) amortized | O(n): walks to the tail |
-| Queue dequeue / front | O(1) | O(1) |
-| Dictionary insert / get / remove | O(log n) | O(h), worst-case O(n) |
-| Dictionary full traversal | O(n) | O(n), with O(h) recursive call depth |
-| Size / empty checks | O(1) | O(1) |
-| Clear | O(n) | O(n) |
+| Operation | Standard version | Manual version | HashMap dictionary |
+|---|---|---|---|
+| Stack push | O(1) amortized | O(1) | — |
+| Stack pop / peek | O(1) | O(1) | — |
+| Queue enqueue | O(1) amortized | O(n): walks to the tail | — |
+| Queue dequeue / front | O(1) | O(1) | — |
+| Dictionary insert / get / remove | O(log n) | O(h), worst-case O(n) | O(1) average |
+| Dictionary full traversal | O(n) | O(n), with O(h) recursive call depth | O(n log n): sorts by key |
+| Size / empty checks | O(1) | O(1) | O(1) |
+| Clear | O(n) | O(n) | O(n) |
 
 The manual queue favors simple, safe ownership over a tail-pointer optimization. The manual tree is not balanced: inserting sorted keys can create a chain. Recursive tree traversal and deletion can exhaust the call stack for sufficiently deep trees. These are educational implementations, not replacements for production collections. Stack/queue cleanup and dictionary cleanup are iterative to avoid recursively dropping a chain of owned nodes. Dictionary cleanup uses rotations to preserve all remaining nodes until they are detached and dropped.
 
@@ -76,7 +79,7 @@ Identical behavior does not imply identical algorithms or running time. The test
 
 ## Expected demonstration
 
-Both headings should show the same operations and results:
+All three headings (standard library, manual nodes, and standard library with the HashMap dictionary) should show the same operations and results:
 
 - Pushing/enqueuing `10, 20, 30` yields stack removal `30 20 10` and queue removal `10 20 30`.
 - Empty removal returns `None`.
@@ -106,7 +109,7 @@ tarea1-estructuras-datos/
 
 This folder lives inside the course repository, next to the other assignments and the mini-project.
 
-The PDF in `docs/` follows the final formatted source line numbers; `docs/SOURCE_MANIFEST.json` records which source versions it describes. Changing the code later can change those numbers. Read its overview and Rust syntax primer first, then follow the source walkthrough in the recommended order.
+The PDF in `docs/` explains the original two-implementation version line by line; `docs/SOURCE_MANIFEST.json` records the exact source versions it describes. The HashMap dictionary was added afterwards: `src/lib.rs`, `src/contracts.rs`, and the three `src/manual_*.rs` files still match the PDF, while `src/std_impl.rs` (new `HashMap` import and the `LibraryHashDictionary` adapter appended at the end), `src/main.rs` (third demonstration), and `tests/behavior.rs` (dictionary scenarios also run against the hash table) have changed. Those additions are described in this README and in `TEST_CASES.md`.
 
 ## References
 
@@ -114,6 +117,7 @@ The PDF in `docs/` follows the final formatted source line numbers; `docs/SOURCE
 - Vec: https://doc.rust-lang.org/std/vec/struct.Vec.html
 - VecDeque: https://doc.rust-lang.org/std/collections/struct.VecDeque.html
 - BTreeMap: https://doc.rust-lang.org/std/collections/struct.BTreeMap.html
+- HashMap: https://doc.rust-lang.org/std/collections/struct.HashMap.html
 - Ownership: https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html
 - Borrowing: https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html
 - Box: https://doc.rust-lang.org/book/ch15-01-box.html

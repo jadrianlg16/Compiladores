@@ -4,7 +4,7 @@
 
 Tool: OpenAI ChatGPT / Codex assistant in ChatGPT Work mode. No other AI assistant was used in this conversation. The assistant read the assignment PDF, proposed the design, generated both Rust implementations, the demonstration, tests, English documentation, and the line-by-line PDF. It also executed local verification and inspected rendered PDF pages. Rust/Cargo, Git, Python, ReportLab, and Poppler are supporting development/document tools, not additional AI models. Official Rust documentation was consulted through web retrieval.
 
-This is substantial AI assistance, including generated code, not merely spelling correction. The student should read the guide, execute the project locally, and make sure they can explain the operations before submission. No claim is made that the student independently authored this code or has already reviewed it.
+This is substantial AI assistance, including generated code, not merely spelling correction.
 
 ## Exact user prompts in this conversation
 
@@ -42,12 +42,24 @@ okay also have the work in english as well as the comments and the code, help me
 
 The assistant made routine implementation and formatting decisions under these requests. No invented user prompt or hidden internal reasoning is presented as a user consultation.
 
-## Review and repository organization
+## Review, repository organization, and HashMap version
 
-Tool: Anthropic Claude Code (desktop app). It did not change any Rust source or test file. It reviewed the delivered project against the assignment PDF, re-ran the tests, formatter, linter, and demonstration, moved the supporting documents into `docs/`, updated file paths in the documentation, added the re-verification section to `docs/VERIFICATION.md`, wrote the course-level `README.md`, and published the folder to the course Git repository.
+Tool: Anthropic Claude Code (desktop app).
 
-Exact prompt (with the project ZIP and the assignment PDF attached):
+With the first prompt below, it reviewed the delivered project against the assignment PDF, re-ran the tests, formatter, linter, and demonstration, moved the supporting documents into `docs/`, updated file paths in the documentation, added a re-verification section to `docs/VERIFICATION.md`, wrote the course-level `README.md`, and published the folder to the course Git repository. It did not change any Rust file in that step.
+
+With the second prompt, it generated the `LibraryHashDictionary` adapter (appended to `src/std_impl.rs`), the third demonstration in `src/main.rs`, and the `hash_table` test module plus the HashMap comparisons in `tests/behavior.rs`. It updated `README.md`, `TEST_CASES.md`, `docs/VERIFICATION.md`, and the captured outputs in `docs/`. It also removed documentation text addressed to the student instead of the reader: it rewrote the dictionary-interpretation paragraph in `README.md`, which asked to confirm the interpretation with the instructor, and removed from this file the two sentences about reading the guide and reviewing the code before submission.
+
+Exact prompts:
+
+1. With the project ZIP and the assignment PDF attached:
 
 ```text
 checa si esto esta bien mi trabajo. dime que si esta bien, que no. esto solo es de la tarea 1 asi que asegurate que se organice muy bien en este folder.  sube a mi github sin claude como coauthor.
+```
+
+2. After Claude Code reported that the project had no hash table and that two documentation sentences were addressed to the student:
+
+```text
+agrega la versión con HashMap y limpia esas frases
 ```

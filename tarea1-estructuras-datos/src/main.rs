@@ -1,9 +1,11 @@
-//! Run identical examples with both implementations.
+//! Run identical examples with every implementation.
 use rust_structures_assignment::contracts::{Dictionary, Queue, Stack};
 use rust_structures_assignment::manual_map::ManualDictionary;
 use rust_structures_assignment::manual_queue::ManualQueue;
 use rust_structures_assignment::manual_stack::ManualStack;
-use rust_structures_assignment::std_impl::{LibraryDictionary, LibraryQueue, LibraryStack};
+use rust_structures_assignment::std_impl::{
+    LibraryDictionary, LibraryHashDictionary, LibraryQueue, LibraryStack,
+};
 
 fn demonstrate<S, Q, D>(label: &str)
 where
@@ -67,4 +69,7 @@ fn main() {
         "STANDARD LIBRARY",
     );
     demonstrate::<ManualStack<i32>, ManualQueue<i32>, ManualDictionary<&str, &str>>("MANUAL NODES");
+    demonstrate::<LibraryStack<i32>, LibraryQueue<i32>, LibraryHashDictionary<&str, &str>>(
+        "STANDARD LIBRARY, HASHMAP DICTIONARY",
+    );
 }

@@ -8,14 +8,14 @@ Lenguaje del mini-proyecto: **Rust**.
 
 | Carpeta | Entrega | Fecha límite |
 |---|---|---|
-| [`tarea1-estructuras-datos/`](tarea1-estructuras-datos/) | Tarea 1: STACK (LIFO), QUEUE (FIFO) y TABLE/DICTIONARY (ordenado por llave), con versión sobre la biblioteca estándar y versión manual | 2026-10-01 |
+| [`tarea1-estructuras-datos/`](tarea1-estructuras-datos/) | Tarea 1: STACK (LIFO), QUEUE (FIFO) y TABLE/HASH/DICTIONARY (recorrido ordenado por llave), con versión sobre la biblioteca estándar, versión manual y diccionario con tabla hash (`HashMap`) | 2026-10-01 |
 
 ## Tarea 1 en corto
 
 ```sh
 cd tarea1-estructuras-datos
 cargo run     # programa de demostración
-cargo test    # 34 pruebas
+cargo test    # 41 pruebas
 ```
 
 - Descripción y diseño: [`tarea1-estructuras-datos/README.md`](tarea1-estructuras-datos/README.md)

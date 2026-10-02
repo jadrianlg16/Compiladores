@@ -1,8 +1,8 @@
 # Test-case descriptions
 
-Run `cargo test`. There are 16 shared scenarios instantiated for each implementation (32 named tests), one 1,000-step differential scenario, and one manual destruction scenario: **34 tests in total**.
+Run `cargo test`. There are 16 shared scenarios instantiated for the `library` and `manual` implementations (32 named tests), the 7 dictionary scenarios instantiated again for the `hash_table` module (`LibraryHashDictionary`), one 1,000-step differential scenario, and one manual destruction scenario: **41 tests in total**.
 
-| Named scenario (in both `library` and `manual`) | Input/actions | Expected result |
+| Named scenario (in `library` and `manual`; the `_dictionary` rows also in `hash_table`) | Input/actions | Expected result |
 |---|---|---|
 | `empty_stack` | Create; query size/top; pop | Empty, size 0, `None`; size stays 0 |
 | `lifo_stack` | Push 10, 20, 30; peek; pop three times | Peek 30 without removal; pop 30, 20, 10 |
@@ -23,7 +23,11 @@ Run `cargo test`. There are 16 shared scenarios instantiated for each implementa
 
 ## Differential test
 
-`deterministic_differential_operations` uses a fixed seed (42) and a reproducible wrapping arithmetic generator. For 1,000 steps it selects insert/add, remove, lookup, or clear operations. It compares returned values, sizes, stack tops, queue fronts, and the complete dictionary traversal after each step between the two versions. This is a broad consistency check against the library-backed implementation, not a proof of correctness or a performance benchmark.
+`deterministic_differential_operations` uses a fixed seed (42) and a reproducible wrapping arithmetic generator. For 1,000 steps it selects insert/add, remove, lookup, or clear operations. It compares returned values, sizes, stack tops, queue fronts, and the complete dictionary traversal after each step between the library and manual versions; the HashMap dictionary is compared against the BTreeMap dictionary in the same way. This is a broad consistency check against the library-backed implementation, not a proof of correctness or a performance benchmark.
+
+## Hash-table ordering check
+
+`HashMap` iterates in an arbitrary order that changes between runs. `sorted_dictionary`, `successor_dictionary`, and the differential test all compare the full traversal, so they fail if `LibraryHashDictionary::visit` stops sorting by key. This was confirmed by deleting the sort line in a scratch copy: those 3 tests failed in each of 3 runs (38 passed, 3 failed), while the unmodified code passed 41 of 41 in 5 consecutive runs.
 
 ## Destruction test
 

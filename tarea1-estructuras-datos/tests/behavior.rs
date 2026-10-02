@@ -1,9 +1,11 @@
-//! The same behavioral checks run against both implementations.
+//! The same behavioral checks run against every implementation.
 use rust_structures_assignment::contracts::{Dictionary, Queue, Stack};
 use rust_structures_assignment::manual_map::ManualDictionary;
 use rust_structures_assignment::manual_queue::ManualQueue;
 use rust_structures_assignment::manual_stack::ManualStack;
-use rust_structures_assignment::std_impl::{LibraryDictionary, LibraryQueue, LibraryStack};
+use rust_structures_assignment::std_impl::{
+    LibraryDictionary, LibraryHashDictionary, LibraryQueue, LibraryStack,
+};
 
 fn stack_empty<S: Stack<i32>>() {
     let mut s = S::default();
@@ -170,6 +172,38 @@ fn dictionary_owned<D: Dictionary<String, String>>() {
 }
 
 // Generate named test wrappers while sharing each scenario's actual assertions.
+macro_rules! dictionary_suite {
+    ($d:ident) => {
+        #[test]
+        fn empty_dictionary() {
+            dictionary_empty::<$d<i32, i32>>();
+        }
+        #[test]
+        fn updated_dictionary() {
+            dictionary_update::<$d<i32, i32>>();
+        }
+        #[test]
+        fn sorted_dictionary() {
+            dictionary_order::<$d<i32, i32>>();
+        }
+        #[test]
+        fn deleted_dictionary() {
+            dictionary_removal::<$d<i32, i32>>();
+        }
+        #[test]
+        fn successor_dictionary() {
+            dictionary_successor::<$d<i32, i32>>();
+        }
+        #[test]
+        fn reusable_dictionary() {
+            dictionary_clear::<$d<i32, i32>>();
+        }
+        #[test]
+        fn owned_dictionary() {
+            dictionary_owned::<$d<String, String>>();
+        }
+    };
+}
 macro_rules! suite {
     ($s:ident, $q:ident, $d:ident) => {
         #[test]
@@ -208,34 +242,7 @@ macro_rules! suite {
         fn owned_queue() {
             queue_owned::<$q<String>>();
         }
-        #[test]
-        fn empty_dictionary() {
-            dictionary_empty::<$d<i32, i32>>();
-        }
-        #[test]
-        fn updated_dictionary() {
-            dictionary_update::<$d<i32, i32>>();
-        }
-        #[test]
-        fn sorted_dictionary() {
-            dictionary_order::<$d<i32, i32>>();
-        }
-        #[test]
-        fn deleted_dictionary() {
-            dictionary_removal::<$d<i32, i32>>();
-        }
-        #[test]
-        fn successor_dictionary() {
-            dictionary_successor::<$d<i32, i32>>();
-        }
-        #[test]
-        fn reusable_dictionary() {
-            dictionary_clear::<$d<i32, i32>>();
-        }
-        #[test]
-        fn owned_dictionary() {
-            dictionary_owned::<$d<String, String>>();
-        }
+        dictionary_suite!($d);
     };
 }
 mod library {
@@ -246,11 +253,16 @@ mod manual {
     use super::*;
     suite!(ManualStack, ManualQueue, ManualDictionary);
 }
+mod hash_table {
+    use super::*;
+    dictionary_suite!(LibraryHashDictionary);
+}
 
 #[test]
 fn deterministic_differential_operations() {
     let mut a = LibraryDictionary::<i32, i32>::default();
     let mut b = ManualDictionary::<i32, i32>::default();
+    let mut c = LibraryHashDictionary::<i32, i32>::default();
     let mut s1 = LibraryStack::<i32>::default();
     let mut s2 = ManualStack::<i32>::default();
     let mut q1 = LibraryQueue::<i32>::default();
@@ -261,21 +273,29 @@ fn deterministic_differential_operations() {
         let key = ((seed >> 8) % 31) as i32;
         match seed % 5 {
             0 | 1 => {
-                assert_eq!(a.insert(key, step), b.insert(key, step));
+                let expected = a.insert(key, step);
+                assert_eq!(b.insert(key, step), expected);
+                assert_eq!(c.insert(key, step), expected);
                 s1.push(key);
                 s2.push(key);
                 q1.enqueue(key);
                 q2.enqueue(key);
             }
             2 => {
-                assert_eq!(a.remove(&key), b.remove(&key));
+                let expected = a.remove(&key);
+                assert_eq!(b.remove(&key), expected);
+                assert_eq!(c.remove(&key), expected);
                 assert_eq!(s1.pop(), s2.pop());
                 assert_eq!(q1.dequeue(), q2.dequeue());
             }
-            3 => assert_eq!(a.get(&key), b.get(&key)),
+            3 => {
+                assert_eq!(b.get(&key), a.get(&key));
+                assert_eq!(c.get(&key), a.get(&key));
+            }
             _ => {
                 a.clear();
                 b.clear();
+                c.clear();
                 s1.clear();
                 s2.clear();
                 q1.clear();
@@ -285,11 +305,15 @@ fn deterministic_differential_operations() {
         assert_eq!(s1.peek(), s2.peek());
         assert_eq!(q1.front(), q2.front());
         assert_eq!((a.len(), s1.len(), q1.len()), (b.len(), s2.len(), q2.len()));
+        assert_eq!(c.len(), a.len());
         let mut x = Vec::new();
         let mut y = Vec::new();
+        let mut z = Vec::new();
         a.visit(|k, v| x.push((*k, *v)));
         b.visit(|k, v| y.push((*k, *v)));
+        c.visit(|k, v| z.push((*k, *v)));
         assert_eq!(x, y);
+        assert_eq!(x, z);
     }
 }
 
