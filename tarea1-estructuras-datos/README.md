@@ -99,6 +99,7 @@ tarea1-estructuras-datos/
 ├── src/               library (contracts, std adapters, manual structures) + demo in main.rs
 ├── tests/behavior.rs  behavioral test suite
 └── docs/
+    ├── interactive_guide.html              interactive guide: playground, annotated code, quiz
     ├── Rust_Data_Structures_Explained.pdf  line-by-line learning guide
     ├── LINE_BY_LINE.json                    data behind the guide
     ├── SOURCE_MANIFEST.json                 SHA-256 of the sources the guide describes
@@ -108,6 +109,17 @@ tarea1-estructuras-datos/
 ```
 
 This folder lives inside the course repository, next to the other assignments and the mini-project.
+
+## Interactive guide
+
+Open `docs/interactive_guide.html` in any browser; it is a single self-contained file. It has four tabs:
+
+- **Playground**: run any operation on any implementation and step through it one source line at a time. A memory diagram shows nodes, the Vec buffer, the VecDeque ring buffer, the binary search tree, or the hash table slots, next to the highlighted line that is running. Scripts replay `main.rs` and several tests.
+- **Code**: every source file with an explanation for each line and a summary for each function.
+- **Big picture**: how the traits, the seven implementations, the demo, and the tests fit together, the cost table, and the Rust concepts used, each linked to the lines that use it.
+- **Quiz**: rounds of ten questions, including generated "predict the result" puzzles.
+
+The page embeds the source code as of the commit that added it, so it does not follow later code changes. The HashMap view is a simplified teaching model (FNV-1a hash, linear probing), not the exact internals of Rust's `HashMap`.
 
 The PDF in `docs/` explains the original two-implementation version line by line; `docs/SOURCE_MANIFEST.json` records the exact source versions it describes. The HashMap dictionary was added afterwards: `src/lib.rs`, `src/contracts.rs`, and the three `src/manual_*.rs` files still match the PDF, while `src/std_impl.rs` (new `HashMap` import and the `LibraryHashDictionary` adapter appended at the end), `src/main.rs` (third demonstration), and `tests/behavior.rs` (dictionary scenarios also run against the hash table) have changed. Those additions are described in this README and in `TEST_CASES.md`.
 

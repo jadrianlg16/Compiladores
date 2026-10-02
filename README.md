@@ -21,4 +21,5 @@ cargo test    # 41 pruebas
 - Descripción y diseño: [`tarea1-estructuras-datos/README.md`](tarea1-estructuras-datos/README.md)
 - Casos de prueba: [`tarea1-estructuras-datos/TEST_CASES.md`](tarea1-estructuras-datos/TEST_CASES.md)
 - Uso de IA (herramientas y prompts): [`tarea1-estructuras-datos/AI_USAGE.md`](tarea1-estructuras-datos/AI_USAGE.md)
+- Guía interactiva (simulador paso a paso, código comentado y quiz): abre [`tarea1-estructuras-datos/docs/interactive_guide.html`](tarea1-estructuras-datos/docs/interactive_guide.html) en el navegador
 - Guía de estudio línea por línea (PDF): [`tarea1-estructuras-datos/docs/`](tarea1-estructuras-datos/docs/)

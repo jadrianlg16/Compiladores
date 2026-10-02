@@ -63,3 +63,11 @@ checa si esto esta bien mi trabajo. dime que si esta bien, que no. esto solo es 
 ```text
 agrega la versión con HashMap y limpia esas frases
 ```
+
+3. Interactive learning page:
+
+```text
+ayudame a agregar un artifacto html que sea interactivo para aprender como funciona, y tomar qui para hacer esto, y alguna represteacion vuizaual de lo que esta pasadno y lo que cada linea o funcion o parte importante en el codigo hace
+```
+
+With the third prompt, Claude Code generated `docs/interactive_guide.html`: a step-by-step simulator of every operation with memory diagrams, an annotated source browser, an overview of the design, and a quiz. It did not change any Rust file in that step. The per-line explanations reuse `docs/LINE_BY_LINE.json` (written by ChatGPT, see above); Claude Code wrote the explanations for the lines added with the HashMap version, the function summaries, the step narrations, and the quiz.
