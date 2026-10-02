@@ -54,6 +54,8 @@ With the third prompt, it generated `docs/interactive_guide.html`: a step-by-ste
 
 With the fourth prompt, it wrote `Entrega_Tarea1.pdf` (in Spanish) and packaged the ZIP for Canvas. It did not change any Rust file in that step.
 
+With the fifth prompt, it rewrote the appendix of `Entrega_Tarea1.pdf` as a one-paragraph summary of the requests made to each tool, labeled as a summary. The exact prompts remain only in this file.
+
 Exact prompts:
 
 1. With the project ZIP and the assignment PDF attached:
@@ -82,4 +84,10 @@ dame el:
 * la tarea se entregará como un zip que contenga todos los archivos de código y un documento que tenga: tu liga de GIT y la descripción breve de qué hiciste: ¿las programaste desde 0? ¿usaste alguna librería? ¿se las solicitaste a alguna herramienta de IA?, además de describir tus test-cases.
 
 basicamente me apoye de la ia para poder desarollar esto y aprender decomo funcionan
+```
+
+5. Shorter appendix in the submission document:
+
+```text
+help me out and for the last page of the pdf basiclaly just have 1 prompt for anthropic and for codex, and make it sound a bit more congruent and direct so not as much whatever the tearea says and more direct, not too smart but better that what is currently there
 ```
