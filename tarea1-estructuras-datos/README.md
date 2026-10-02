@@ -93,6 +93,7 @@ All three headings (standard library, manual nodes, and standard library with th
 ```text
 tarea1-estructuras-datos/
 ├── Cargo.toml, Cargo.lock
+├── Entrega_Tarea1.pdf submission document for Canvas (Spanish): Git link, approach, AI use, test cases
 ├── README.md          this overview
 ├── TEST_CASES.md      test-case descriptions (deliverable)
 ├── AI_USAGE.md        AI tools and exact prompts used (deliverable)

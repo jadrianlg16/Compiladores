@@ -42,13 +42,17 @@ okay also have the work in english as well as the comments and the code, help me
 
 The assistant made routine implementation and formatting decisions under these requests. No invented user prompt or hidden internal reasoning is presented as a user consultation.
 
-## Review, repository organization, and HashMap version
+## Review, repository organization, HashMap version, learning guide, and submission
 
 Tool: Anthropic Claude Code (desktop app).
 
 With the first prompt below, it reviewed the delivered project against the assignment PDF, re-ran the tests, formatter, linter, and demonstration, moved the supporting documents into `docs/`, updated file paths in the documentation, added a re-verification section to `docs/VERIFICATION.md`, wrote the course-level `README.md`, and published the folder to the course Git repository. It did not change any Rust file in that step.
 
 With the second prompt, it generated the `LibraryHashDictionary` adapter (appended to `src/std_impl.rs`), the third demonstration in `src/main.rs`, and the `hash_table` test module plus the HashMap comparisons in `tests/behavior.rs`. It updated `README.md`, `TEST_CASES.md`, `docs/VERIFICATION.md`, and the captured outputs in `docs/`. It also removed documentation text addressed to the student instead of the reader: it rewrote the dictionary-interpretation paragraph in `README.md`, which asked to confirm the interpretation with the instructor, and removed from this file the two sentences about reading the guide and reviewing the code before submission.
+
+With the third prompt, it generated `docs/interactive_guide.html`: a step-by-step simulator of every operation with memory diagrams, an annotated source browser, an overview of the design, and a quiz. It did not change any Rust file in that step. The per-line explanations reuse `docs/LINE_BY_LINE.json` (written by ChatGPT, see above); Claude Code wrote the explanations for the lines added with the HashMap version, the function summaries, the step narrations, and the quiz.
+
+With the fourth prompt, it wrote `Entrega_Tarea1.pdf` (in Spanish) and packaged the ZIP for Canvas. It did not change any Rust file in that step.
 
 Exact prompts:
 
@@ -70,4 +74,12 @@ agrega la versión con HashMap y limpia esas frases
 ayudame a agregar un artifacto html que sea interactivo para aprender como funciona, y tomar qui para hacer esto, y alguna represteacion vuizaual de lo que esta pasadno y lo que cada linea o funcion o parte importante en el codigo hace
 ```
 
-With the third prompt, Claude Code generated `docs/interactive_guide.html`: a step-by-step simulator of every operation with memory diagrams, an annotated source browser, an overview of the design, and a quiz. It did not change any Rust file in that step. The per-line explanations reuse `docs/LINE_BY_LINE.json` (written by ChatGPT, see above); Claude Code wrote the explanations for the lines added with the HashMap version, the function summaries, the step narrations, and the quiz.
+4. Submission document and ZIP (the bullet is the assignment's submission instructions, pasted by the student):
+
+```text
+dame el:
+
+* la tarea se entregará como un zip que contenga todos los archivos de código y un documento que tenga: tu liga de GIT y la descripción breve de qué hiciste: ¿las programaste desde 0? ¿usaste alguna librería? ¿se las solicitaste a alguna herramienta de IA?, además de describir tus test-cases.
+
+basicamente me apoye de la ia para poder desarollar esto y aprender decomo funcionan
+```
