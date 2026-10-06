@@ -117,13 +117,24 @@ Las tres opciones generan analizadores a partir de reglas, pero difieren en cóm
 
 ## Uso de inteligencia artificial
 
-- **Herramienta:** ChatGPT, con asistencia de Codex para consultar documentación oficial y preparar el documento. Se usó búsqueda web para verificar características.
+### Documento de entrega
+
+Según el documento:
+
+- **Herramienta:** ChatGPT, con asistencia de Codex para consultar documentación oficial y preparar el ejemplo, el código y el documento. Se usó búsqueda web para verificar características.
 - **Modelo:** no se declara porque no se proporcionó un identificador comprobable.
 
 Prompts utilizados, copiados literalmente:
 
 1. > Ayúdame a hacer el research para hacer la siguiente tarea. Yo quiero hacer la tarea pero apreciaría de tu ayuda con links del research con resúmenes para que pueda comprobar yo la información. la información que me enseñes hazlo con diferentes niveles de dificultad. primero presenta la información de manera clara, concisa y sin tanto técnico jargon. después profundiza en los temas con ejemplos
 2. > Aqui esta lo que desarrolle ayudame analizandolo, dime si me falta algo, si esto es trabajo apropiado en base a los requisitos de la tarea o si piensas que puede mejorarse de alguna manera y porque
+
+### Este README
+
+- **Herramienta:** Claude Code (modelo Claude Opus 5.5). Redactó este README a partir del documento de entrega, escribió los ejemplos de código propio y los compiló y ejecutó para verificarlos.
+- **Prompt, copiado literalmente:**
+
+  > agrega el siguiente dox al github, agrega un readme bueno
 
 ## Referencias
 
